@@ -1,0 +1,678 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Master the Morgue</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: case-file folder. Sticky tab strip like file dividers; content in a single readable column; tag-yellow marks evidence. */
+:root{
+  --bg:#fafaf7; --panel:#fff; --ink:#1a1a18; --muted:#666; --line:#ddd;
+  --accent:#185FA5; --accent-ink:#fff; --tag:#fff; --tag-ink:#185FA5;
+  --good:#2f6b2f; --good-bg:#eef6ec; --bad:#a33; --bad-bg:#fbeeee; --soft:#f2f2ee;
+  --display:system-ui,-apple-system,"Segoe UI",sans-serif;
+  --body:system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#1c1c1b; --panel:#262624; --ink:#eee; --muted:#aaa; --line:#444;
+  --accent:#85B7EB; --accent-ink:#1c1c1b; --tag:#262624; --tag-ink:#85B7EB;
+  --good:#8fd18f; --good-bg:#223322; --bad:#f09595; --bad-bg:#3a2222; --soft:#2e2e2c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1c1c1b; --panel:#262624; --ink:#eee; --muted:#aaa; --line:#444;
+  --accent:#85B7EB; --accent-ink:#1c1c1b; --tag:#262624; --tag-ink:#85B7EB;
+  --good:#8fd18f; --good-bg:#223322; --bad:#f09595; --bad-bg:#3a2222; --soft:#2e2e2c; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--panel)}
+.wrap{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.top{padding-block:28px 18px;display:flex;flex-wrap:wrap;gap:12px 20px;align-items:flex-end;justify-content:space-between}
+.eyebrow{font-size:12px;color:var(--muted)}
+h1{font-family:var(--display);font-weight:500;font-size:24px;line-height:1.2;margin:4px 0 0;text-wrap:balance}
+.tag{display:inline-block;background:var(--tag);color:var(--tag-ink);border:1px solid var(--line);font-size:13px;padding:6px 12px;border-radius:8px}
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+nav.tabs .wrap{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+nav.tabs a{font-size:14px;text-decoration:none;color:var(--muted);padding:12px 12px 10px;border-bottom:3px solid transparent;white-space:nowrap}
+nav.tabs a[aria-current="page"]{color:var(--ink);border-bottom-color:var(--accent)}
+nav.tabs a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+main{padding-block:24px 64px}
+h2{font-family:var(--display);font-weight:500;font-size:20px;line-height:1.2;margin:0 0 6px;text-wrap:balance}
+h3{font-family:var(--display);font-weight:500;font-size:19px;margin:0 0 8px}
+p{margin:0 0 12px;max-width:68ch}
+.lede{color:var(--muted);margin-bottom:20px}
+section.act{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px;display:grid;gap:14px;margin-bottom:18px}
+.act-head{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+.num{font-family:var(--mono);font-size:13px;color:var(--accent);font-weight:500}
+ul.pts{margin:0;padding-left:20px;display:grid;gap:6px}
+ul.pts li{max-width:68ch}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:4px}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:13px;color:var(--ink);background:none;font-weight:500}
+tr:last-child td{border-bottom:0}
+td.k{font-weight:600;white-space:nowrap}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.callout{border:1px solid var(--line);background:var(--soft);padding:12px 14px;border-radius:8px}
+.callout p:last-child{margin:0}
+.flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:14px}
+.flow span{background:var(--soft);border:1px solid var(--line);padding:4px 8px;border-radius:4px}
+.flow i{font-style:normal;color:var(--muted)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.mini{border:1px solid var(--line);border-radius:4px;padding:12px;display:grid;gap:4px;min-width:0}
+.mini b{font-family:var(--display);font-weight:500}
+.mini small{color:var(--muted);font-family:var(--mono);font-size:12px}
+/* timeline */
+.tl{display:grid;gap:0;border-left:2px solid var(--line);margin-left:6px}
+.tl div{position:relative;padding:0 0 14px 18px}
+.tl div::before{content:"";position:absolute;left:-7px;top:6px;width:12px;height:12px;border-radius:50%;background:var(--panel);border:2px solid var(--accent)}
+.tl .t{font-family:var(--mono);font-size:13px;color:var(--accent)}
+/* calculator */
+.calc{display:grid;gap:12px}
+.row{display:flex;flex-wrap:wrap;gap:12px;align-items:end}
+label{display:grid;gap:4px;font-size:13px;color:var(--muted);font-family:var(--mono)}
+input,select{font:inherit;font-size:16px;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:8px 10px;min-width:0}
+input[type=number]{width:120px}
+.result{font-family:var(--display);font-size:22px}
+/* glossary */
+.tools{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+.tools input{flex:1 1 220px}
+dl.gl{margin:0;display:grid;gap:0;background:var(--panel);border:1px solid var(--line);border-radius:12px}
+dl.gl div{padding:12px 16px;border-bottom:1px solid var(--line);display:grid;gap:2px}
+dl.gl div:last-child{border-bottom:0}
+dt{font-weight:600}
+dt small{font-family:var(--mono);font-weight:400;font-size:11.5px;color:var(--muted);margin-left:8px}
+dd{margin:0;color:var(--ink);max-width:68ch}
+.empty{padding:16px;color:var(--muted)}
+/* buttons */
+button{font:inherit;font-size:14px;cursor:pointer;border-radius:8px;padding:8px 12px;border:1px solid var(--line);background:none;color:var(--ink)}
+button.primary{border-color:var(--accent);color:var(--accent);background:none}
+button:disabled{opacity:.5;cursor:default}
+/* flashcards */
+.card{perspective:1200px;height:260px;cursor:pointer;margin:6px 0 14px}
+.card-in{position:relative;width:100%;height:100%;transition:transform .45s;transform-style:preserve-3d}
+.card.flip .card-in{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px;display:flex;flex-direction:column;justify-content:center;gap:10px;overflow:auto}
+.face.back{transform:rotateY(180deg)}
+.face .lbl{font-size:12px;color:var(--muted)}
+.face .big{font-size:18px;line-height:1.5}
+.face .def{font-size:18px;line-height:1.5}
+.ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.count{font-family:var(--mono);font-size:13px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){.card-in{transition:none}}
+/* quiz */
+.q{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px;display:grid;gap:12px}
+.q .stem{font-size:18px;font-weight:500}
+.opts{display:grid;gap:8px}
+.opt{text-align:left;padding:11px 14px;font-size:15.5px;background:var(--panel)}
+.opt.right{background:var(--good-bg);border-color:var(--good);color:var(--ink)}
+.opt.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--ink)}
+.fb{padding:10px 14px;border-radius:4px;font-size:15px}
+.fb.ok{background:var(--good-bg);color:var(--good)}
+.fb.no{background:var(--bad-bg);color:var(--bad)}
+.fb span{color:var(--ink)}
+.bar{height:6px;background:var(--soft);border-radius:3px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);transition:width .3s}
+.score{font-size:32px;font-weight:500;line-height:1}
+.miss{display:grid;gap:10px;margin-top:8px}
+.miss div{border:1px solid var(--line);border-radius:4px;padding:10px 12px;background:var(--panel)}
+.miss small{display:block;color:var(--muted)}
+.foot{color:var(--muted);font-size:13px;margin-top:28px}
+</style>
+
+<header class="wrap top">
+  <div>
+    <div class="eyebrow">PBS · Unit 1 · Lesson 1.2</div>
+    <h1>Master the Morgue</h1>
+  </div>
+  <div class="tag">Case 16218857 · Garcia, Anna</div>
+</header>
+
+<nav class="tabs" aria-label="Study guide sections"><div class="wrap">
+  <a href="#notes" data-v="notes">Notes</a>
+  <a href="#case" data-v="case">Anna's case</a>
+  <a href="#terms" data-v="terms">Vocabulary</a>
+  <a href="#cards" data-v="cards">Flashcards</a>
+  <a href="#quiz" data-v="quiz">Practice quiz</a>
+</div></nav>
+
+<main class="wrap">
+
+<!-- NOTES -->
+<div id="v-notes" data-view>
+  <h2>Activity notes</h2>
+  <p class="lede">The key ideas from 1.2.1 through 1.2.6, in the order the lesson teaches them.</p>
+
+  <section class="act">
+    <div class="act-head"><span class="num">1.2.1</span><h3>Anatomy of an Autopsy</h3></div>
+    <p>An <b>autopsy</b> is a systematic examination of the entire body after death, done to find out how and why a person died. It is done when a death is suspicious or unexpected, when there's a public health concern (like a contagious disease), or when the family requests it. A <b>medical examiner</b> or <b>coroner</b> performs it.</p>
+    <div class="grid2">
+      <div class="mini"><small>External examination</small>Body is described (hair, eye color, sex), measured, and weighed. External injuries are noted.</div>
+      <div class="mini"><small>Identification</small>Tattoos, birthmarks, and other marks. Personal documents (license) or friends/relatives.</div>
+      <div class="mini"><small>Documentation</small>Photographs record injuries, identifying features, and decomposition.</div>
+      <div class="mini"><small>Internal examination</small><b>Y incision</b> from each shoulder to the center of the chest, then down the body. Organs are examined in place, removed, and weighed.</div>
+      <div class="mini"><small>Brain</small>Checked for injury, then removed from the skull, weighed, and examined.</div>
+      <div class="mini"><small>Stomach contents</small>Identity and degree of digestion of food or pills. Can help estimate time of death.</div>
+      <div class="mini"><small>Sample collection</small>Blood, urine, and tissue samples are sent out for testing to help confirm identity and cause of death.</div>
+      <div class="mini"><small>Tools</small>Saws, scissors, needles, and other tools for the internal exam and to stitch the body after.</div>
+    </div>
+    <p><b>Gross examination</b> ("grossing") means looking at organs and tissues with the naked eye and describing them. It gives clues before microscopic work.</p>
+    <div class="tbl-wrap"><table>
+      <tr><th>Term</th><th>Meaning</th><th>Example from the lesson</th></tr>
+      <tr><td class="k">Cause</td><td>The specific injury, trauma, or disease that directly caused death</td><td>Gunshot wound</td></tr>
+      <tr><td class="k">Mechanism</td><td>What happens physiologically (inside the body) to result in death</td><td>Exsanguination (extreme blood loss)</td></tr>
+      <tr><td class="k">Manner</td><td>The circumstances: natural or unnatural. Unnatural is split into accident, homicide, or undetermined.</td><td>Homicide</td></tr>
+    </table></div>
+    <p>Manner usually needs the most information from outside the autopsy (scene evidence, history, witnesses).</p>
+    <p><b>Autopsy report sections</b> (from the Autopsy Report Guide): decedent information, examination info (forensic vs. clinical autopsy), clothing and personal effects, medical intervention, features of identification, evidence of injury (sketched on <b>anterior</b> = front and <b>posterior</b> = back views, using the decedent's right and left), postmortem changes, external exam, internal exam, toxicology, lab, and histology results, case summary, and cause/mechanism/manner of death.</p>
+    <p>A <b>forensic</b> autopsy seeks cause and manner of death or identifies the decedent. A <b>clinical</b> (pathological) autopsy diagnoses disease or is done for research.</p>
+  </section>
+
+  <section class="act">
+    <div class="act-head"><span class="num">1.2.1</span><h3>Body systems</h3></div>
+    <p>Organs are grouped into <b>systems</b> that work together. A problem in one system can have minor to very serious effects on others.</p>
+    <div class="tbl-wrap"><table id="sysTable"></table></div>
+  </section>
+
+  <section class="act">
+    <div class="act-head"><span class="num">1.2.2</span><h3>Time of Death</h3></div>
+    <div class="tbl-wrap"><table>
+      <tr><th>Time of death</th><th>Definition</th></tr>
+      <tr><td class="k">Physiological</td><td>When the decedent's vital functions actually stopped. Hard to pin down exactly.</td></tr>
+      <tr><td class="k">Estimated</td><td>The time the medical examiner estimates the death occurred.</td></tr>
+      <tr><td class="k">Legal</td><td>The time on the death certificate, based on when the body was found or pronounced dead.</td></tr>
+    </table></div>
+    <h3>Changes after death</h3>
+    <div class="tbl-wrap"><table>
+      <tr><th>Change</th><th>Timing</th><th>What happens</th></tr>
+      <tr><td class="k">Algor mortis</td><td class="mono">0–24 h</td><td>Body cools (or warms) to match its surroundings, roughly 1.5 °F per hour. Reaches room temperature within about 24 hours. Room temperature, sun, wind, snow, and clothing all change the rate.</td></tr>
+      <tr><td class="k">Corneal clouding</td><td class="mono">3–4 h</td><td>Corneas (normally clear) turn milky or cloudy within the first several hours.</td></tr>
+      <tr><td class="k">Rigor mortis</td><td class="mono">starts 2–4 h<br>full 8–12 h<br>fades 36–48 h</td><td>Muscles contract and stiffen. Starts in the head and neck, then arms and legs. Full rigor "fixes" the body in its position at death. Fades as decomposition begins.</td></tr>
+      <tr><td class="k">Livor mortis (lividity)</td><td class="mono">early &lt;2 h<br>full ~5 h<br>fixed 8–12 h</td><td>Heart stops, so gravity pulls blood to the parts of the body facing the ground. Shows as a bluish color.</td></tr>
+      <tr><td class="k">Decomposition</td><td class="mono">36–48 h</td><td>Body turns greenish and may bloat as bacteria break down tissue and release gas. Also called putrefaction.</td></tr>
+      <tr><td class="k">Insect activity</td><td class="mono">varies</td><td>Eggs, larvae, or adult insects show how long the body has been decaying. Blue bottle flies take about two weeks from egg to adult at 68–70 °F.</td></tr>
+    </table></div>
+    <p>Investigators never rely on just one or two of these. Body clues are combined with <b>scene markers</b>: dated texts, emails, or mail, a broken clock, even dishes in the sink.</p>
+    <div class="callout"><p><b>Glaister equation</b> (uses °F): <span class="mono">(98.4 − rectal temperature) ÷ 1.5 = approximate hours since death</span>. Core temperature is taken rectally or with a probe in the liver or brain because of their large mass and density.</p></div>
+    <h3>The cooling experiment</h3>
+    <p>Problem statement: <i>How do different ambient temperatures affect the rate of body cooling?</i> Hot dogs stood in for bodies and a temperature probe tracked "body temperature."</p>
+    <div class="flow"><span>1 Identify the question</span><i>→</i><span>2 Make a prediction</span><i>→</i><span>3 Design an experiment</span><i>→</i><span>4 Conduct the experiment</span><i>→</i><span>5 Analyze the data</span><i>→</i><span>6 Communicate findings</span></div>
+    <ul class="pts">
+      <li><b>Hypothesis</b>: a testable prediction. <b>Independent variable</b>: what you change (ambient temperature). <b>Dependent variable</b>: what you measure (body temperature over time).</li>
+      <li><b>Control group</b>: a standard of comparison that does not receive the treatment, used as a benchmark to measure change in the group that did.</li>
+      <li>Celsius to Fahrenheit: <span class="mono">(°C × 1.8) + 32 = °F</span>. So 20 °C = 68 °F and 50 °C = 122 °F.</li>
+    </ul>
+    <p><b>Body farm</b>: research site where donated bodies decompose under different conditions. Dr. William Bass founded the first one in 1972 at the University of Tennessee, Knoxville. A <b>forensic entomologist</b> studies insects and arachnids in criminal investigations.</p>
+  </section>
+
+  <section class="act">
+    <div class="act-head"><span class="num">1.2.3</span><h3>Forensic Toxicology</h3></div>
+    <p><b>Toxicology</b> studies the effects of chemicals (drugs, alcohol, poisons, metals, gases) on the body. "All things are poisons... It is only the dose which makes a thing poison." (Paracelsus). Safe dosage depends on height, weight, and other substances in the body.</p>
+    <p>A <b>forensic toxicologist</b> analyzes tissue and fluid samples from the autopsy for substances that may have contributed to death. Toxicologists also test living people, usually urine, blood, saliva, or hair.</p>
+    <h3>Digestion and metabolism</h3>
+    <ul class="pts">
+      <li>The digestive system breaks food into <b>nutrients</b> and <b>molecules</b> used to build body parts, drive <b>chemical reactions</b> (like aerobic respiration), and supply energy. It also removes waste.</li>
+      <li><b>Physical digestion</b>: mechanical breakdown, like chewing. <b>Chemical digestion</b>: acids and enzymes break food into smaller molecules (saliva enzymes turn complex carbohydrates into simple sugars).</li>
+      <li>Path of food: <span class="mono">oral cavity → esophagus → stomach → small intestine → large intestine</span>.</li>
+      <li><b>Metabolism</b>: breaking substances down and converting the smaller molecules into new substances. <b>Metabolites</b> are the byproducts, found in blood, sweat, urine, skin, hair, and nails. Toxicologists test for metabolites of known substances.</li>
+    </ul>
+    <h3>Two kinds of tests</h3>
+    <div class="grid2">
+      <div class="mini"><small>Presumptive test</small><b>Is a type of substance present?</b>Quick, usually a color change. Can't name the exact substance. Example: the <b>Marquis test</b> turns purple for opioids. Uses negative and positive controls.</div>
+      <div class="mini"><small>Confirmatory test</small><b>Exactly what is it, and how much?</b>Specific. Example: <b>gas chromatography</b> separates a compound's components by chemical properties (sample showed hydrocodone, acetaminophen, caffeine).</div>
+    </div>
+    <p>A <b>forensic chemist</b> tests nonbiological samples (powders, pills). The pill lab compared an unknown to aspirin (acetylsalicylic acid), acetaminophen, oxycodone (prescription opioid), and ecstasy (illicit), using color, texture, and reactions to distilled water, pH, hydrochloric acid, and ferric nitrate.</p>
+  </section>
+
+  <section class="act">
+    <div class="act-head"><span class="num">1.2.4</span><h3>Histology</h3></div>
+    <div class="flow"><span>Cell</span><i>→</i><span>Tissue</span><i>→</i><span>Organ</span><i>→</i><span>Organ system</span><i>→</i><span>Organism</span></div>
+    <p>The <b>nervous system</b> (brain, brain stem, spinal cord, nerves) receives, interprets, and reacts to signals using chemical and electrical signals. It controls sensation, movement, digestion, and involuntary actions like breathing. Damage to the breathing area of the brain can stop breathing and cause death.</p>
+    <div class="grid2">
+      <div class="mini"><small>CNS</small><b>Central nervous system</b>Brain and spinal cord.</div>
+      <div class="mini"><small>PNS</small><b>Peripheral nervous system</b>All the nerves in the body.</div>
+      <div class="mini"><small>TBI</small><b>Traumatic brain injury</b>Brain dysfunction caused by an outside force to the head.</div>
+      <div class="mini"><small>CTE</small><b>Chronic traumatic encephalopathy</b>Progressive degeneration or death of nerve cells from repeated head injuries, like repeated concussions.</div>
+    </div>
+    <h3>Four tissue types</h3>
+    <div class="tbl-wrap"><table>
+      <tr><th>Tissue</th><th>Where</th><th>Job</th></tr>
+      <tr><td class="k">Nervous</td><td>Nerves, spinal cord, brain. Made of neurons.</td><td>Receive, interpret, and respond to signals</td></tr>
+      <tr><td class="k">Epithelial</td><td>Sheets of connected cells lining outer surfaces of organs and blood vessels, the mouth, and skin</td><td>Absorb, secrete, protect, sense</td></tr>
+      <tr><td class="k">Muscle</td><td>Skeletal (striated, on bones), smooth (walls of internal organs), cardiac (heart walls)</td><td>Contract</td></tr>
+      <tr><td class="k">Connective</td><td>Attached to and between other tissues</td><td>Support and connect: hold organs in place, attach muscle to bone, link bones at joints, let tissues stretch</td></tr>
+    </table></div>
+    <ul class="pts">
+      <li>A <b>histologist</b> examines tissues. Blunt force trauma, lack of oxygen, chemical exposure, and infection leave characteristic marks on tissue. Histologists also examine <b>biopsies</b> from living patients (for example, to confirm cancer).</li>
+      <li>All cells share the same <b>genome</b> (DNA). Different cell types come from different genes being used.</li>
+      <li><b>Total magnification</b> = ocular (10×) × objective. 4× → 40×, 10× → 100×, 40× → 400×. Start on the 4× scanning objective, then move up.</li>
+    </ul>
+  </section>
+
+  <section class="act">
+    <div class="act-head"><span class="num">1.2.5</span><h3>Gross Anatomy Examination (heart)</h3></div>
+    <p>The heart sits near the middle of the chest and pumps blood so nutrients are delivered, wastes are removed, and oxygen is carried from the lungs to the body. It has four <b>chambers</b>: two <b>atria</b> (upper) and two <b>ventricles</b> (lower), separated by <b>valves</b>.</p>
+    <div class="tbl-wrap"><table>
+      <tr><th>Valve</th><th>Location / job</th></tr>
+      <tr><td class="k">Tricuspid</td><td>Between right atrium and right ventricle</td></tr>
+      <tr><td class="k">Pulmonary</td><td>Lets blood flow from the right ventricle into the pulmonary artery</td></tr>
+      <tr><td class="k">Mitral</td><td>Between left atrium and left ventricle</td></tr>
+      <tr><td class="k">Aortic</td><td>Lets blood flow from the left ventricle into the aorta</td></tr>
+    </table></div>
+    <p><b>Path of blood</b></p>
+    <div class="flow"><span>Body</span><i>→</i><span>Vena cavae</span><i>→</i><span>Right atrium</span><i>→</i><span>Tricuspid</span><i>→</i><span>Right ventricle</span><i>→</i><span>Pulmonary valve</span><i>→</i><span>Pulmonary arteries</span><i>→</i><span>Lungs</span><i>→</i><span>Pulmonary veins</span><i>→</i><span>Left atrium</span><i>→</i><span>Mitral</span><i>→</i><span>Left ventricle</span><i>→</i><span>Aortic valve</span><i>→</i><span>Aorta</span><i>→</i><span>Body</span></div>
+    <ul class="pts">
+      <li><b>Pulmonary circulation</b>: heart → lungs to pick up oxygen → back to heart. <b>Systemic circulation</b>: oxygen-rich blood → body, deoxygenated blood → back to heart.</li>
+      <li>The exception to "arteries carry oxygenated blood": <b>pulmonary arteries</b> carry deoxygenated blood to the lungs and <b>pulmonary veins</b> carry oxygenated blood back to the heart.</li>
+      <li>The <b>left ventricle</b> has the thickest wall because it pumps blood to the whole body.</li>
+      <li><b>Anterior</b> view = front. <b>Posterior</b> = back.</li>
+    </ul>
+    <p><b>Conditions to know</b>: sudden cardiac arrest, congenital heart failure, valve defects, atrial and ventricular septal defects (holes in the wall between chambers), Eisenmenger syndrome, bacterial endocarditis (infection of the heart lining/valves), and hypertrophic cardiomyopathy (abnormally thick heart muscle). <b>Left ventricular hypertrophy</b> is thickening of the left ventricle wall. It can be fatal if untreated because a thick, stiff wall fills and pumps less effectively and can cause dangerous rhythms. Rare, but young healthy people can die suddenly from heart problems, often inherited ones.</p>
+  </section>
+
+  <section class="act">
+    <div class="act-head"><span class="num">1.2.6</span><h3>Case Closed</h3></div>
+    <p>Pull together scene evidence and the full autopsy report into a forensics report for the commissioner: evidence analyzed, autopsy report, timeline, conclusions, and a recommendation on whether to pursue a criminal case. Summarize Anna's <b>cause, mechanism, and manner</b> of death.</p>
+    <p>Errors on an autopsy report could lead to inaccurate findings, prosecution of the innocent, exoneration of the guilty, or false closure for families. "To the living we owe respect, but to the dead we owe only the truth." (Voltaire)</p>
+  </section>
+</div>
+
+<!-- CASE -->
+<div id="v-case" data-view hidden>
+  <h2>Anna Garcia's case</h2>
+  <p class="lede">The facts given in the lesson. Brain and heart findings came from your class's specimens and slides, so fill those in from your own notes.</p>
+  <section class="act">
+    <h3>Timeline</h3>
+    <div class="tl">
+      <div><span class="t">~10:00 p.m. (night before)</span><br>Estimated time of death from the Glaister equation (see below).</div>
+      <div><span class="t">10:00 a.m.</span><br>Friend Taylor Diaz finds Anna. Emergency call comes in.</div>
+      <div><span class="t">10:10 a.m.</span><br>Police and EMT arrive. Anna is face down in the research lab.</div>
+      <div><span class="t">11:30 a.m.</span><br>Medical examiner measures rectal temperature: <span class="mono">78.2 °F</span>.</div>
+    </div>
+  </section>
+  <section class="act">
+    <h3>Scene and body</h3>
+    <ul class="pts">
+      <li>Lab was 70 °F inside; 92 °F outside.</li>
+      <li>Full rigor mortis (full at 8–12 h, before fading at 36–48 h).</li>
+      <li>Fixed lividity on the front of her body (fixed at 8–12 h; front side matches being found face down).</li>
+      <li>Both support a death roughly 8–36 hours before discovery, consistent with the Glaister estimate.</li>
+    </ul>
+    <div class="calc">
+      <h3>Glaister calculator</h3>
+      <div class="row">
+        <label for="gT">Rectal temp (°F)<input id="gT" type="number" step="0.1" value="78.2"></label>
+        <label for="gM">Measured at<input id="gM" type="time" value="11:30"></label>
+      </div>
+      <div class="result" id="gOut"></div>
+      <p class="mono" id="gWork" style="color:var(--muted);font-size:14px"></p>
+    </div>
+  </section>
+  <section class="act">
+    <h3>Toxicology report (blood)</h3>
+    <div class="tbl-wrap"><table>
+      <tr><th>Substance</th><th>Result</th><th>Amount</th><th>Reference</th></tr>
+      <tr><td class="k">Caffeine</td><td>Positive</td><td class="mono">10 mg/L</td><td>15–20 elevated but nontoxic; 80–180 linked to deaths</td></tr>
+      <tr><td class="k">Aspirin (acetylsalicylic acid)</td><td>Positive</td><td class="mono">20 mg/L</td><td>150–300 therapeutic; over 300 toxic</td></tr>
+      <tr><td class="k">Ethanol</td><td>Negative</td><td class="mono">0</td><td>CNS depressant; also made during decomposition</td></tr>
+      <tr><td class="k">Opiates</td><td>Negative</td><td class="mono">0</td><td>CNS; block pain</td></tr>
+      <tr><td class="k">Methamphetamine</td><td>Negative</td><td class="mono">0</td><td>CNS stimulant</td></tr>
+      <tr><td class="k">Cocaine</td><td>Negative</td><td class="mono">0</td><td>CNS stimulant</td></tr>
+      <tr><td class="k">Cannabinoids</td><td>Negative</td><td class="mono">0</td><td>Depressant, stimulant, or hallucinogen</td></tr>
+    </table></div>
+    <p>Both positives are well below harmful levels, so toxicology does not explain her death. The pill in her stomach was identified in the 1.2.3 lab.</p>
+  </section>
+  <section class="act">
+    <h3>Your notes to fill in</h3>
+    <ul class="pts">
+      <li>Brain MRI, cross-section, and slide findings (1.2.4): normal, TBI, or CTE?</li>
+      <li>Heart findings (1.2.5): what abnormality did Anna's heart show, and could it cause death? The conclusion questions point toward left ventricular hypertrophy.</li>
+      <li>Final cause, mechanism, and manner (1.2.6).</li>
+    </ul>
+  </section>
+</div>
+
+<!-- TERMS -->
+<div id="v-terms" data-view hidden>
+  <h2>Vocabulary</h2>
+  <p class="lede"><span id="termCount"></span> terms from Lesson 1.2.</p>
+  <div class="tools">
+    <input id="termQ" type="search" placeholder="Search terms, e.g. lividity" aria-label="Search terms">
+    <select id="termF" aria-label="Filter by activity"></select>
+  </div>
+  <dl class="gl" id="termList"></dl>
+</div>
+
+<!-- CARDS -->
+<div id="v-cards" data-view hidden>
+  <h2>Flashcards</h2>
+  <p class="lede">Tap the card to flip. Arrow keys move, space flips.</p>
+  <div class="tools">
+    <select id="cardF" aria-label="Card deck"></select>
+    <select id="cardSide" aria-label="Which side shows first">
+      <option value="term">Show term first</option>
+      <option value="def">Show definition first</option>
+    </select>
+  </div>
+  <div class="card" id="card" role="button" tabindex="0" aria-label="Flashcard, press to flip">
+    <div class="card-in">
+      <div class="face front"><div class="lbl" id="cfL"></div><div class="big" id="cfT"></div></div>
+      <div class="face back"><div class="lbl" id="cbL"></div><div class="def" id="cbT"></div></div>
+    </div>
+  </div>
+  <div class="ctl">
+    <button id="cPrev" aria-label="Previous card">← Prev</button>
+    <span class="count" id="cCount"></span>
+    <button id="cShuf">Shuffle</button>
+    <button id="cNext" class="primary" aria-label="Next card">Next →</button>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div id="v-quiz" data-view hidden>
+  <h2>Practice quiz</h2>
+  <p class="lede">Questions are drawn at random from all of 1.2. Each answer shows an explanation.</p>
+  <div class="tools">
+    <select id="qN" aria-label="Number of questions">
+      <option value="10">10 questions</option>
+      <option value="20" selected>20 questions</option>
+      <option value="all">All questions</option>
+    </select>
+    <select id="qF" aria-label="Quiz topic"></select>
+    <button class="primary" id="qStart">Start new quiz</button>
+  </div>
+  <div id="qArea"></div>
+</div>
+
+<p class="foot">Built from the PLTW Principles of Biomedical Science Lesson 1.2 activities, the Body Systems Matching Cards, the Autopsy Report Guide, and Anna Garcia's toxicology report.</p>
+</main>
+
+<script>
+const SYS=[
+["Digestive","Breaks down food into nutrient molecules; absorbs nutrients; rids the body of waste.","Oral cavity, esophagus, stomach, small intestine, large intestine"],
+["Skeletal","Protects and supports body organs; provides a framework muscles use to cause movement; stores minerals.","Bones, joints"],
+["Muscular","Moves the body and moves substances around the body; maintains posture; produces heat.","Skeletal, cardiac, and smooth muscle"],
+["Nervous","Responds to internal and external changes by activating an appropriate response; processes information.","Brain, spinal cord, nerves, sensory receptors"],
+["Endocrine","Secretes hormones that regulate growth, reproduction, and metabolism by body cells.","Testis, adrenal gland, pituitary gland, ovary"],
+["Cardiovascular","Pumps blood around the body; transports oxygen, carbon dioxide, nutrients, and waste.","Heart, blood vessels (veins, arteries, capillaries)"],
+["Respiratory","Gas exchange with the external environment; keeps blood supplied with oxygen and removes carbon dioxide.","Nasal cavity, trachea, lungs, bronchus"],
+["Lymphatic / immune","Filters fluid in the body; mounts the attack against foreign substances.","Lymph nodes, spleen, thymus, bone marrow"],
+["Urinary","Eliminates waste from the body; regulates water balance of the blood.","Kidney, bladder, ureter, urethra"],
+["Integumentary","Forms the body's external covering; protects deeper tissue from injury; helps regulate body temperature.","Hair, skin, nails"],
+["Reproductive","Produces, transports, and sustains sperm and egg cells; nurtures the developing offspring.","Ovaries, uterus, vagina; testes, prostate, penis"]];
+
+const T=[ // [term, definition, activity]
+["Autopsy","Systematic examination of the entire body after death to find out how and why a person died.","1.2.1"],
+["Morgue","Facility where bodies are kept and autopsies are performed.","1.2.1"],
+["Postmortem","After death.","1.2.1"],
+["Medical examiner","Medical professional (a physician) responsible for investigating and recording deaths and performing autopsies.","1.2.1"],
+["Coroner","Official responsible for recording deaths; may or may not be a physician.","1.2.1"],
+["Cause of death","The specific injury, trauma, or disease that directly caused death. Example: gunshot wound.","1.2.1"],
+["Mechanism of death","What happens physiologically (inside the body) to result in death. Example: exsanguination.","1.2.1"],
+["Manner of death","The circumstances resulting in death: natural or unnatural (accident, homicide, or undetermined). Example: homicide.","1.2.1"],
+["Exsanguination","Extreme blood loss.","1.2.1"],
+["Gross examination","Visually inspecting organs or tissues and describing what is seen, before microscopic examination. Also called grossing.","1.2.1"],
+["Y incision","First internal autopsy cut: from each shoulder to the center of the chest, then down the body.","1.2.1"],
+["Anterior","Front view of the body.","1.2.1"],
+["Posterior","Back view of the body.","1.2.1"],
+["Forensic autopsy","Autopsy done to find cause and manner of death or to identify the decedent.","1.2.1"],
+["Clinical autopsy","Autopsy done to diagnose disease or for research. Also called pathological.","1.2.1"],
+["Decedent","The person who died.","1.2.1"],
+["Organ system","A group of organs that work together to perform specific functions.","1.2.1"],
+["Physiological time of death","The time when the decedent's vital functions actually ceased.","1.2.2"],
+["Estimated time of death","The time the medical examiner estimates the death occurred.","1.2.2"],
+["Legal time of death","Time recorded on the death certificate; based on when the body was found or pronounced dead.","1.2.2"],
+["Algor mortis","Postmortem change in body temperature as the body cools (or warms) to match its surroundings; about 1.5 °F per hour, reaching room temperature within about 24 hours.","1.2.2"],
+["Rigor mortis","Stiffening of muscles after death. Begins 2–4 h, starting in the head and neck; full at 8–12 h; fades at 36–48 h.","1.2.2"],
+["Livor mortis","Bluish color where blood pools on the parts of the body facing the ground. Also called lividity. Early within 2 h, full by 5 h, fixed at 8–12 h.","1.2.2"],
+["Corneal clouding","Corneas become milky or cloudy within the first several hours (3–4 h) after death.","1.2.2"],
+["Decomposition","Breakdown of the body starting 36–48 h after death; turns greenish and bloats as bacteria release gas. Also called putrefaction.","1.2.2"],
+["Scene markers","Clues at the scene that help establish a timeline, such as dated texts, mail, a broken clock, or dishes in the sink.","1.2.2"],
+["Body farm","Research site where donated bodies decompose under various conditions. First founded by Dr. William Bass in 1972 at the University of Tennessee.","1.2.2"],
+["Forensic entomologist","Scientist who studies insects and arachnids as they relate to criminal investigations.","1.2.2"],
+["Blowfly","Fly that arrives at a body soon after death; its well-documented life cycle helps estimate time of death.","1.2.2"],
+["Postmortem interval","The time since death.","1.2.2"],
+["Glaister equation","(98.4 − rectal temperature in °F) ÷ 1.5 = approximate hours since death.","1.2.2"],
+["Ambient temperature","The air temperature of the surroundings.","1.2.2"],
+["Hypothesis","A testable prediction about the outcome of an experiment.","1.2.2"],
+["Independent variable","The factor the experimenter changes. In the cooling lab: ambient temperature.","1.2.2"],
+["Dependent variable","The factor that is measured. In the cooling lab: body temperature over time.","1.2.2"],
+["Control group","Standard of comparison that does not receive the treatment; a benchmark to measure change in the treated group.","1.2.2"],
+["Unit conversion","Converting a quantity to the equivalent amount in another unit. °F = (°C × 1.8) + 32.","1.2.2"],
+["Toxicology","Science of the effects of chemicals (drugs, alcohol, poisons, metals, gases) on the human body.","1.2.3"],
+["Toxin","A poisonous substance produced by a living organism.","1.2.3"],
+["Toxicant","A poisonous substance made by humans or released into the environment by human activity.","1.2.3"],
+["Forensic toxicologist","Analyzes autopsy tissue and fluid samples for substances that may have contributed to death.","1.2.3"],
+["Forensic chemist","Tests nonbiological samples like powders and pills to find their identity, components, or concentration.","1.2.3"],
+["Presumptive test","Quick test showing whether a type of substance is present but not its exact identity, often by color change.","1.2.3"],
+["Confirmatory test","Specific test that determines the exact identity and composition of a substance.","1.2.3"],
+["Marquis test","Presumptive test for opioids; the sample turns purple if an opioid is present.","1.2.3"],
+["Gas chromatography","Confirmatory test that separates a compound's components based on their chemical properties.","1.2.3"],
+["Physical digestion","Mechanical breakdown of food into smaller parts, like chewing.","1.2.3"],
+["Chemical digestion","Use of acids and enzymes to break food into smaller molecules.","1.2.3"],
+["Nutrients","Substances from food the body needs to build parts, power reactions, and supply energy.","1.2.3"],
+["Metabolism","Breaking substances down and converting the smaller molecules into new substances.","1.2.3"],
+["Metabolites","Small molecules produced as byproducts of metabolism; found in blood, sweat, urine, hair, and nails.","1.2.3"],
+["Histology","Study of tissues under the microscope.","1.2.4"],
+["Histologist","Examines body tissues for clues such as trauma, lack of oxygen, chemical exposure, or infection.","1.2.4"],
+["Cell","Smallest unit of life.","1.2.4"],
+["Tissue","Group of similarly functioning cells working together.","1.2.4"],
+["Organ","Group of tissues that perform a specific function.","1.2.4"],
+["Neuron","Specialized cell of nervous tissue that receives, interprets, and responds to signals.","1.2.4"],
+["Nervous tissue","Makes up nerves, spinal cord, and brain; receives, interprets, and responds to signals.","1.2.4"],
+["Epithelial tissue","Sheets of connected cells lining organ and blood vessel surfaces, the mouth, and skin; absorbs, secretes, protects, senses.","1.2.4"],
+["Muscle tissue","Skeletal (striated), smooth, or cardiac tissue that contracts.","1.2.4"],
+["Connective tissue","Supports and connects other tissues: holds organs, attaches muscle to bone, links bones, lets tissues stretch.","1.2.4"],
+["Central nervous system (CNS)","The brain and spinal cord.","1.2.4"],
+["Peripheral nervous system (PNS)","All the nerves outside the brain and spinal cord.","1.2.4"],
+["Traumatic brain injury (TBI)","Brain dysfunction caused by an outside force to the head.","1.2.4"],
+["Chronic traumatic encephalopathy (CTE)","Progressive degeneration or death of nerve cells caused by repeated head injuries such as concussions.","1.2.4"],
+["Biopsy","Tissue removed from a living person to diagnose or evaluate disease.","1.2.4"],
+["Genome","An organism's complete set of DNA; every body cell has a copy.","1.2.4"],
+["Total magnification","Ocular (10×) × objective lens. 40× objective gives 400×.","1.2.4"],
+["Cardiovascular system","Heart and blood vessels; moves blood to deliver nutrients and oxygen and remove waste.","1.2.5"],
+["Atria","The two upper chambers of the heart.","1.2.5"],
+["Ventricles","The two lower chambers of the heart.","1.2.5"],
+["Valves","Flaps that control blood flow between heart chambers and into major vessels.","1.2.5"],
+["Tricuspid valve","Separates the right atrium from the right ventricle.","1.2.5"],
+["Mitral valve","Separates the left atrium from the left ventricle.","1.2.5"],
+["Pulmonary valve","Lets blood flow from the right ventricle into the pulmonary artery.","1.2.5"],
+["Aortic valve","Lets blood flow from the left ventricle into the aorta.","1.2.5"],
+["Aorta","Largest artery; carries oxygenated blood from the left ventricle to the body.","1.2.5"],
+["Pulmonary circulation","Blood moves from the heart to the lungs to pick up oxygen and back to the heart.","1.2.5"],
+["Systemic circulation","Oxygen-rich blood is pumped to the body, and deoxygenated blood returns to the heart.","1.2.5"],
+["Left ventricular hypertrophy","Thickening of the left ventricle wall; can be fatal if untreated.","1.2.5"],
+["Hypertrophic cardiomyopathy","Condition where the heart muscle becomes abnormally thick, often inherited; a cause of sudden death in young people.","1.2.5"],
+["Septal defect","A hole in the wall (septum) between the atria or between the ventricles.","1.2.5"],
+["Bacterial endocarditis","Bacterial infection of the inner lining of the heart, usually the valves.","1.2.5"],
+["Sudden cardiac arrest","Heart suddenly stops beating effectively.","1.2.5"]];
+SYS.forEach(s=>T.push([s[0]+" system",s[1]+" Key structures: "+s[2]+".","Body systems"]));
+
+const Q=[ // [activity, question, [options], correctIndex, explanation]
+["1.2.1","A death certificate lists \"gunshot wound.\" Which part of the death is this?",["Cause","Mechanism","Manner","Legal time"],0,"The cause is the specific injury, trauma, or disease that directly caused death."],
+["1.2.1","Exsanguination (extreme blood loss) is an example of the…",["Cause of death","Mechanism of death","Manner of death","Postmortem interval"],1,"Mechanism is what happens physiologically inside the body to result in death."],
+["1.2.1","\"Homicide\" describes which part of a death?",["Cause","Mechanism","Manner","Estimated time"],2,"Manner is the circumstances: natural or unnatural (accident, homicide, undetermined)."],
+["1.2.1","Which aspect of death most often needs information from outside the autopsy?",["Cause","Mechanism","Manner","Weight of organs"],2,"Manner depends on circumstances (scene, history, witnesses), not just the body."],
+["1.2.1","Where does the Y incision run?",["Across the abdomen only","From each shoulder to the center of the chest, then down the body","Around the skull","Down the spine"],1,"The Y incision opens the chest and abdomen for the internal exam."],
+["1.2.1","What does \"gross examination\" mean?",["Examining tissue under a microscope","Inspecting organs with the naked eye and describing them","Testing blood for drugs","Photographing the body"],1,"Grossing gives clues before microscopic examination is done."],
+["1.2.1","On an autopsy report sketch, the posterior view shows the…",["Front of the body","Back of the body","Top of the skull","Left side only"],1,"Anterior = front, posterior = back."],
+["1.2.1","Why does the medical examiner examine stomach contents?",["To find the decedent's height","To see the identity and degree of digestion of food or pills, which can help estimate time of death","To identify tattoos","To measure rigor"],1,"Digestion state and contents give timing and toxicology clues."],
+["1.2.1","Which autopsy is done mainly to diagnose disease or for research?",["Forensic","Clinical (pathological)","Legal","Gross"],1,"Forensic autopsies seek cause and manner of death or identity."],
+["Body systems","Which system has the kidney, bladder, ureter, and urethra?",["Digestive","Reproductive","Urinary","Lymphatic"],2,"The urinary system eliminates waste and regulates the blood's water balance."],
+["Body systems","\"Filters fluid in the body; mounts the attack against foreign substances\" describes the…",["Urinary system","Lymphatic/immune system","Endocrine system","Integumentary system"],1,"Key structures on the PLTW card: lymph nodes, spleen, thymus, bone marrow."],
+["Body systems","Which system secretes hormones that regulate growth, reproduction, and metabolism?",["Nervous","Reproductive","Endocrine","Digestive"],2,"PLTW card structures: testis, adrenal gland, pituitary gland, ovary."],
+["Body systems","Hair, skin, and nails belong to the…",["Skeletal system","Integumentary system","Muscular system","Lymphatic system"],1,"It forms the external covering, protects deeper tissue, and helps regulate temperature."],
+["Body systems","Which system protects organs, provides a framework for movement, and stores minerals?",["Muscular","Skeletal","Integumentary","Nervous"],1,"Key structures: bones and joints."],
+["Body systems","\"Moves the body; maintains posture; produces heat\" is the function of the…",["Skeletal system","Nervous system","Muscular system","Cardiovascular system"],2,"Structures: skeletal, cardiac, and smooth muscle."],
+["Body systems","On the PLTW matching card, which system lists bone marrow as a key structure?",["Skeletal","Lymphatic/immune","Cardiovascular","Endocrine"],1,"The card puts bone marrow with lymph nodes, spleen, and thymus."],
+["Body systems","Nasal cavity, trachea, lungs, and bronchus are part of the…",["Digestive system","Respiratory system","Cardiovascular system","Lymphatic system"],1,"It handles gas exchange: brings in oxygen and removes carbon dioxide."],
+["1.2.2","Which time of death is written on the death certificate?",["Physiological","Estimated","Legal","Algor"],2,"Legal time of death is based on when the body was found or pronounced dead."],
+["1.2.2","The time when vital functions actually ceased is the…",["Legal time of death","Physiological time of death","Estimated time of death","Postmortem interval"],1,"It's often hard to determine exactly."],
+["1.2.2","Algor mortis refers to…",["Muscle stiffening","Blood pooling","Body temperature change after death","Corneal clouding"],2,"The body cools or warms to match its surroundings, about 1.5 °F per hour."],
+["1.2.2","Which refers to blood pooling or settling in the body?",["Rigor mortis","Livor mortis","Algor mortis","Putrefaction"],1,"Livor mortis (lividity) appears as a bluish color on the parts facing the ground."],
+["1.2.2","Rigor mortis is first observed in the…",["Feet","Arms and legs","Head and neck","Abdomen"],2,"It starts in the head and neck, then moves to the arms and legs."],
+["1.2.2","When is rigor mortis fully present throughout the body?",["30 minutes","2–4 hours","8–12 hours","3 days"],2,"Full rigor at 8–12 h fixes the body in its position; it fades at 36–48 h."],
+["1.2.2","Lividity becomes fixed in place at about…",["1 hour","5 hours","8–12 hours","48 hours"],2,"Early signs within 2 h, full signs by 5 h, fixed at 8–12 h."],
+["1.2.2","Within the first several hours after death, the corneas…",["Turn green","Become milky or cloudy","Turn bright red","Harden"],1,"Corneal clouding shows within about 3–4 hours."],
+["1.2.2","Decomposition (putrefaction) typically begins…",["Right away","2–4 hours after death","36–48 hours after death","After 2 weeks"],2,"The body turns greenish and may bloat as bacteria release gas."],
+["1.2.2","A body's rectal temperature is 86.4 °F. Using the Glaister equation, about how long ago did the person die?",["4 hours","8 hours","12 hours","16 hours"],1,"(98.4 − 86.4) ÷ 1.5 = 12 ÷ 1.5 = 8 hours."],
+["1.2.2","Anna's rectal temperature was 78.2 °F at 11:30 a.m. About how many hours had passed since death?",["6.7 hours","10 hours","13.5 hours","20 hours"],2,"(98.4 − 78.2) ÷ 1.5 = 20.2 ÷ 1.5 ≈ 13.5 hours, so death around 10 p.m. the night before."],
+["1.2.2","In the cooling experiment, the independent variable was…",["Body temperature","Ambient (air) temperature","Time","The probe"],1,"You change ambient temperature and measure the effect on body temperature."],
+["1.2.2","In the cooling experiment, the dependent variable was…",["Ambient temperature","The type of hot dog","Body temperature over time","The room size"],2,"The dependent variable is what you measure."],
+["1.2.2","Why include a control group?",["To make the experiment shorter","It serves as a standard of comparison that doesn't receive the treatment","To add more variables","It's the group that gets the most treatment"],1,"It's the benchmark for measuring change in the treated group."],
+["1.2.2","What is 20 °C in Fahrenheit?",["52 °F","68 °F","72 °F","36 °F"],1,"(20 × 1.8) + 32 = 68 °F."],
+["1.2.2","What is 50 °C in Fahrenheit?",["90 °F","112 °F","122 °F","132 °F"],2,"(50 × 1.8) + 32 = 122 °F."],
+["1.2.2","Which of these is a scene marker?",["Lividity","A dated text message","Corneal clouding","Rectal temperature"],1,"Scene markers are clues at the scene such as dated texts, mail, a broken clock, or dishes in the sink."],
+["1.2.2","Who founded the first body farm, and where?",["Paracelsus, Switzerland","Dr. William Bass, University of Tennessee","Voltaire, France","Dr. Ponni Arunkumar, Chicago"],1,"Bass founded it in 1972 in Knoxville."],
+["1.2.2","A forensic entomologist studies…",["Tissues","Insects and arachnids","Poisons","Bones"],1,"Insect life cycles, such as blowflies, help estimate time of death."],
+["1.2.2","Why can't investigators rely on algor mortis alone?",["It never changes","Air temperature, sun, wind, snow, and clothing all change the cooling rate","It only works after 3 days","It only works in water"],1,"That's why they combine several body changes with scene evidence."],
+["1.2.3","\"It is only the dose which makes a thing poison\" was said by…",["Voltaire","Paracelsus","William Bass","Hippocrates"],1,"Paracelsus (1493–1541)."],
+["1.2.3","Which test only tells you a type of substance may be present?",["Confirmatory test","Presumptive test","Gas chromatography","Histology"],1,"Presumptive tests are quick, often a color change, and need confirmation."],
+["1.2.3","The Marquis test turns purple when what is present?",["Caffeine","Aspirin","Opioids","Alcohol"],2,"Further confirmatory testing identifies the specific opioid."],
+["1.2.3","Gas chromatography is an example of a…",["Presumptive test","Confirmatory test","Histology slide","Gross exam"],1,"It separates a compound's components based on chemical properties."],
+["1.2.3","Chewing is an example of…",["Chemical digestion","Physical digestion","Metabolism","Absorption"],1,"Physical digestion is mechanical breakdown. Enzymes and acids are chemical digestion."],
+["1.2.3","Small molecules produced as byproducts of metabolism are called…",["Nutrients","Toxins","Metabolites","Enzymes"],2,"Toxicologists test fluids and tissues for metabolites of known substances."],
+["1.2.3","Who tests nonbiological samples like powders and pills?",["Forensic toxicologist","Forensic chemist","Histologist","Entomologist"],1,"Forensic toxicologists test the body's tissues and fluids."],
+["1.2.3","Anna's blood had 20 mg/L aspirin. Therapeutic is 150–300 mg/L. What does that mean?",["Toxic level","Below therapeutic; not harmful","Exactly therapeutic","Fatal level"],1,"Toxic is over 300 mg/L. Her aspirin did not cause her death."],
+["1.2.3","Anna's caffeine level was 10 mg/L. Levels linked to caffeine deaths are…",["10–15 mg/L","15–20 mg/L","80–180 mg/L","Over 1000 mg/L"],2,"15–20 mg/L is elevated but nontoxic, so 10 mg/L is not harmful."],
+["1.2.3","Why can a positive ethanol test in a dead body be misleading?",["Ethanol is never in blood","Ethanol can be a natural product of decomposition","It is always from medicine","The test can't detect it"],1,"The toxicology report notes this."],
+["1.2.3","What is the correct order food travels?",["Esophagus → oral cavity → stomach → large intestine → small intestine","Oral cavity → esophagus → stomach → small intestine → large intestine","Oral cavity → stomach → esophagus → small intestine → large intestine","Stomach → esophagus → small intestine → large intestine"],1,"Most nutrient absorption happens in the small intestine."],
+["1.2.4","Order the levels of organization from smallest to largest.",["Tissue → cell → organ → organ system","Cell → tissue → organ → organ system","Cell → organ → tissue → organ system","Organ → tissue → cell → organ system"],1,"Similar cells form tissues, tissues form organs, organs form systems."],
+["1.2.4","The central nervous system is made of…",["All the nerves","The brain and spinal cord","Nerves and muscles","The brain only"],1,"The peripheral nervous system is all the other nerves."],
+["1.2.4","Which tissue type lines organ surfaces, blood vessels, and the mouth, and absorbs, secretes, protects, and senses?",["Connective","Muscle","Epithelial","Nervous"],2,"Epithelial cells are aligned in connected sheets."],
+["1.2.4","Which tissue type holds organs in place and attaches muscle to bone?",["Connective","Epithelial","Nervous","Smooth muscle"],0,"Connective tissue supports and connects other tissues."],
+["1.2.4","Smooth muscle is found in…",["Bones","The walls of internal organs","The heart wall","The brain"],1,"Skeletal (striated) is on bones; cardiac is in the heart wall."],
+["1.2.4","Neurons are the specialized cells of which tissue?",["Epithelial","Connective","Nervous","Muscle"],2,"Nervous tissue receives, interprets, and responds to signals."],
+["1.2.4","Brain dysfunction caused by an outside force to the head is…",["CTE","TBI","CNS","PNS"],1,"Traumatic brain injury."],
+["1.2.4","Progressive nerve cell degeneration from repeated head injuries is…",["TBI","CTE","Stroke","Endocarditis"],1,"Chronic traumatic encephalopathy, often from repeated concussions."],
+["1.2.4","Using the 40× objective with a 10× ocular, the total magnification is…",["50×","40×","400×","4000×"],2,"Ocular × objective = 10 × 40 = 400×."],
+["1.2.4","Which objective should you start with when viewing a slide?",["40× high power","100× oil","4× scanning","10× low power"],2,"Start at 4×, then move to 10× and 40×."],
+["1.2.4","Every body cell has the same DNA. Why are there different tissue types?",["Cells have different genomes","Different cells use (express) different genes","Tissues come from food","Only nerve cells have DNA"],1,"Same genome, different genes switched on."],
+["1.2.5","The two upper chambers of the heart are the…",["Ventricles","Atria","Valves","Aortas"],1,"The ventricles are the two lower chambers."],
+["1.2.5","Which valve separates the left atrium from the left ventricle?",["Tricuspid","Pulmonary","Mitral","Aortic"],2,"The tricuspid separates the right atrium from the right ventricle."],
+["1.2.5","Which valve separates the right atrium from the right ventricle?",["Mitral","Tricuspid","Aortic","Pulmonary"],1,"Tri = right side; mitral = left side."],
+["1.2.5","Blood leaving the left ventricle passes through which valve?",["Pulmonary","Mitral","Aortic","Tricuspid"],2,"The aortic valve opens into the aorta, which carries blood to the body."],
+["1.2.5","Pulmonary circulation carries blood…",["From the heart to the body","From the heart to the lungs and back","From the lungs to the brain","Through the liver"],1,"Systemic circulation carries blood to the body and back."],
+["1.2.5","Which vessels carry deoxygenated blood even though they're arteries?",["Coronary arteries","Pulmonary arteries","Carotid arteries","Aorta"],1,"Pulmonary arteries take oxygen-poor blood to the lungs; pulmonary veins return oxygen-rich blood."],
+["1.2.5","Which chamber has the thickest muscular wall?",["Right atrium","Left atrium","Right ventricle","Left ventricle"],3,"It pumps blood out to the entire body."],
+["1.2.5","Why can left ventricular hypertrophy be fatal if untreated?",["The wall thins and tears","A thickened, stiff wall fills and pumps less effectively and can trigger dangerous rhythms","It blocks the trachea","It lowers blood sugar"],1,"The heart has to work harder and may fail or stop suddenly."],
+["1.2.5","A hole in the wall between two heart chambers is a…",["Valve defect","Septal defect","Endocarditis","Hypertrophy"],1,"Atrial and ventricular septal defects."],
+["1.2.5","Bacterial endocarditis is…",["Thickening of the heart wall","Infection of the inner lining of the heart, usually the valves","A blocked artery","A blood clot in the lungs"],1,"Bacteria damage the valves."],
+["1.2.5","Place the steps in order: right atrium → ? → right ventricle → ? → lungs",["Mitral valve; aortic valve","Tricuspid valve; pulmonary valve","Pulmonary valve; tricuspid valve","Aortic valve; mitral valve"],1,"Right side: tricuspid then pulmonary valve to the pulmonary arteries."],
+["Anna's case","Anna's lividity was fixed on the front of her body. What does that support?",["She died lying on her back","She lay face down for 8–12+ hours after death","She died minutes before being found","She was moved immediately after death"],1,"She was found face down, and lividity is fixed after 8–12 hours."],
+["Anna's case","Anna was in full rigor mortis when found. This suggests she had been dead…",["Less than 1 hour","About 8 to 36 hours","More than a week","Exactly 2 hours"],1,"Full rigor is reached at 8–12 h and fades at 36–48 h."],
+["Anna's case","Who found Anna, and when?",["Her professor at 8 a.m.","Taylor Diaz at 10:00 a.m.","Police at 11:30 a.m.","Her roommate at midnight"],1,"Police and EMT arrived at 10:10 a.m."],
+["Anna's case","Which statement about Anna's toxicology results is accurate?",["Opiates were positive","Ethanol was positive","Caffeine and aspirin were positive but below harmful levels","Cocaine was positive"],2,"All other substances screened were negative."]
+];
+
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const ACTS=["1.2.1","Body systems","1.2.2","1.2.3","1.2.4","1.2.5"];
+const ACTNAME={"1.2.1":"1.2.1 Autopsy","Body systems":"Body systems","1.2.2":"1.2.2 Time of death","1.2.3":"1.2.3 Toxicology","1.2.4":"1.2.4 Histology","1.2.5":"1.2.5 Heart","Anna's case":"Anna's case"};
+
+/* body systems table */
+$("#sysTable").innerHTML="<tr><th>System</th><th>Function</th><th>Key structures</th></tr>"+SYS.map(s=>`<tr><td class="k">${esc(s[0])}</td><td>${esc(s[1])}</td><td>${esc(s[2])}</td></tr>`).join("");
+
+/* router */
+const VIEWS=["notes","case","terms","cards","quiz"];
+function route(){
+  const h=(location.hash||"").slice(1); const v=VIEWS.includes(h)?h:"notes";
+  document.querySelectorAll("[data-view]").forEach(el=>el.hidden=el.id!=="v-"+v);
+  document.querySelectorAll("nav.tabs a").forEach(a=>{if(a.dataset.v===v)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
+}
+addEventListener("hashchange",()=>{route();scrollTo(0,0)});route();
+
+/* glaister */
+function glaister(){
+  const t=parseFloat($("#gT").value); const m=$("#gM").value;
+  if(isNaN(t)||!m){$("#gOut").textContent="Enter a temperature and time.";$("#gWork").textContent="";return}
+  const h=(98.4-t)/1.5;
+  if(h<0){$("#gOut").textContent="Temperature is above 98.4 °F, so the equation doesn't apply.";$("#gWork").textContent="";return}
+  const [hh,mm]=m.split(":").map(Number); let mins=hh*60+mm-Math.round(h*60);
+  let dayNote=""; while(mins<0){mins+=1440;dayNote=dayNote?"two or more days before":"the day before"}
+  const H=Math.floor(mins/60),M=mins%60; const ap=H>=12?"p.m.":"a.m."; const h12=((H+11)%12)+1;
+  $("#gOut").textContent=`≈ ${h.toFixed(1)} hours since death → about ${h12}:${String(M).padStart(2,"0")} ${ap}${dayNote?" ("+dayNote+")":""}`;
+  $("#gWork").textContent=`(98.4 − ${t}) ÷ 1.5 = ${(98.4-t).toFixed(1)} ÷ 1.5 = ${h.toFixed(2)} h`;
+}
+$("#gT").addEventListener("input",glaister);$("#gM").addEventListener("input",glaister);glaister();
+
+/* glossary */
+const actOpts=["all",...ACTS];
+$("#termF").innerHTML=actOpts.map(a=>`<option value="${esc(a)}">${a==="all"?"All activities":esc(ACTNAME[a])}</option>`).join("");
+$("#termCount").textContent=T.length;
+function renderTerms(){
+  const q=$("#termQ").value.trim().toLowerCase(); const f=$("#termF").value;
+  const list=T.filter(t=>(f==="all"||t[2]===f)&&(!q||t[0].toLowerCase().includes(q)||t[1].toLowerCase().includes(q)))
+    .sort((a,b)=>a[0].localeCompare(b[0]));
+  $("#termList").innerHTML=list.length?list.map(t=>`<div><dt>${esc(t[0])}<small>${esc(ACTNAME[t[2]])}</small></dt><dd>${esc(t[1])}</dd></div>`).join(""):`<div class="empty">No terms match. Try a shorter search.</div>`;
+}
+$("#termQ").addEventListener("input",renderTerms);$("#termF").addEventListener("change",renderTerms);renderTerms();
+
+/* flashcards */
+$("#cardF").innerHTML=`<option value="all">All terms (${T.length})</option>`+ACTS.map(a=>`<option value="${esc(a)}">${esc(ACTNAME[a])} (${T.filter(t=>t[2]===a).length})</option>`).join("");
+let deck=[],ci=0,flipped=false;
+function buildDeck(){const f=$("#cardF").value;deck=T.filter(t=>f==="all"||t[2]===f);ci=0;flipped=false;showCard()}
+function showCard(){
+  const c=deck[ci]; if(!c)return; const termFirst=$("#cardSide").value==="term";
+  $("#card").classList.toggle("flip",flipped);
+  $("#cfL").textContent=termFirst?"Term":"Definition"; $("#cbL").textContent=termFirst?"Definition":"Term";
+  $("#cfT").textContent=termFirst?c[0]:c[1]; $("#cbT").textContent=termFirst?c[1]:c[0];
+  $("#cfT").className=termFirst?"big":"def"; $("#cbT").className=termFirst?"def":"big";
+  $("#cCount").textContent=`${ci+1} / ${deck.length} · ${ACTNAME[c[2]]}`;
+}
+function flip(){flipped=!flipped;$("#card").classList.toggle("flip",flipped)}
+function move(d){ci=(ci+d+deck.length)%deck.length;flipped=false;$("#card").classList.remove("flip");setTimeout(showCard,flipped?0:120)}
+$("#card").addEventListener("click",flip);
+$("#card").addEventListener("keydown",e=>{if(e.key===" "||e.key==="Enter"){e.preventDefault();flip()}});
+$("#cPrev").onclick=()=>move(-1);$("#cNext").onclick=()=>move(1);
+$("#cShuf").onclick=()=>{deck=shuffle(deck);ci=0;flipped=false;$("#card").classList.remove("flip");showCard()};
+$("#cardF").onchange=buildDeck;$("#cardSide").onchange=()=>{flipped=false;showCard()};
+addEventListener("keydown",e=>{if(location.hash!=="#cards"||e.target.matches("input,select,textarea"))return;
+  if(e.key==="ArrowRight")move(1);else if(e.key==="ArrowLeft")move(-1);else if(e.key===" "&&e.target!==$("#card")){e.preventDefault();flip()}});
+buildDeck();
+
+/* quiz */
+const qTopics=["all",...ACTS,"Anna's case"];
+$("#qF").innerHTML=qTopics.map(a=>`<option value="${esc(a)}">${a==="all"?"All topics":esc(ACTNAME[a])} (${a==="all"?Q.length:Q.filter(q=>q[0]===a).length})</option>`).join("");
+let quiz=[],qi=0,score=0,answered=false,missed=[];
+function startQuiz(){
+  const f=$("#qF").value,n=$("#qN").value;
+  let pool=shuffle(Q.filter(q=>f==="all"||q[0]===f));
+  if(n!=="all")pool=pool.slice(0,+n);
+  quiz=pool.map(q=>{const order=shuffle(q[2].map((o,i)=>i));return{act:q[0],stem:q[1],opts:order.map(i=>q[2][i]),ans:order.indexOf(q[3]),why:q[4]}});
+  qi=0;score=0;missed=[];renderQ();
+}
+function renderQ(){
+  if(qi>=quiz.length)return renderResult();
+  answered=false; const q=quiz[qi];
+  $("#qArea").innerHTML=`<div class="q">
+    <div class="bar"><i style="width:${Math.round(qi/quiz.length*100)}%"></i></div>
+    <div class="count">Question ${qi+1} of ${quiz.length} · ${esc(ACTNAME[q.act])} · Score ${score}</div>
+    <div class="stem">${esc(q.stem)}</div>
+    <div class="opts">${q.opts.map((o,i)=>`<button class="opt" data-i="${i}">${String.fromCharCode(65+i)}. ${esc(o)}</button>`).join("")}</div>
+    <div id="qFb"></div>
+    <div class="ctl"><span></span><button class="primary" id="qNext" hidden>${qi+1===quiz.length?"See results":"Next question →"}</button></div>
+  </div>`;
+  $("#qArea").querySelectorAll(".opt").forEach(b=>b.onclick=()=>answer(+b.dataset.i));
+  $("#qNext").onclick=()=>{qi++;renderQ();$("#qArea").scrollIntoView({block:"nearest"})};
+}
+function answer(i){
+  if(answered)return; answered=true; const q=quiz[qi]; const ok=i===q.ans; if(ok)score++; else missed.push(q);
+  $("#qArea").querySelectorAll(".opt").forEach((b,j)=>{b.disabled=true;if(j===q.ans)b.classList.add("right");else if(j===i)b.classList.add("wrong")});
+  $("#qFb").innerHTML=`<div class="fb ${ok?"ok":"no"}"><b>${ok?"Correct.":"Not quite."}</b> <span>${esc(q.why)}</span></div>`;
+  $("#qNext").hidden=false;$("#qNext").focus();
+}
+function renderResult(){
+  const pct=Math.round(score/quiz.length*100);
+  $("#qArea").innerHTML=`<div class="q">
+    <div class="eyebrow">Results</div>
+    <div class="score">${score} / ${quiz.length}</div>
+    <p>${pct}% correct. ${pct>=90?"Ready for the test.":pct>=70?"Solid. Review the misses below.":"Go back over the notes for the topics below, then try again."}</p>
+    ${missed.length?`<h3>Review</h3><div class="miss">${missed.map(m=>`<div><small>${esc(ACTNAME[m.act])}</small>${esc(m.stem)}<br><b>${esc(m.opts[m.ans])}</b><small>${esc(m.why)}</small></div>`).join("")}</div>`:""}
+    <div class="ctl"><span></span><button class="primary" id="qAgain">Try another quiz</button></div>
+  </div>`;
+  $("#qAgain").onclick=startQuiz;
+}
+$("#qStart").onclick=startQuiz;
+startQuiz();
+</script>
+
+</body></html>
