@@ -680,15 +680,19 @@ ul.pts li[data-fid],p[data-fid]{padding:4px 8px;margin-left:-8px}
 
     <div class="heart-label-section" id="heartLabelActivity">
       <h4>Label the heart</h4>
-      <p class="heart-lede">The same four-chamber layout as your reference picture, with all 16 labels removed. Drag a label onto the diagram, or tap a label and then tap its correct location. Check your answers only when you're finished.</p>
+      <p class="heart-lede">Label the four heart chambers, four valves, and four major vessels. Lungs and body stay visible as landmarks. Drag a label onto the diagram, or tap a label and then its correct location. Check only when finished.</p>
       <div class="heart-label-scroll">
-        <div class="heart-label-canvas" id="heartLabelCanvas" aria-label="Unlabeled blood-flow diagram with sixteen answer locations">
+        <div class="heart-label-canvas" id="heartLabelCanvas" aria-label="Heart blood-flow diagram with twelve unlabeled anatomical structures">
           <svg viewBox="0 0 760 480" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="heartLabelArtTitle heartLabelArtDesc">
             <title id="heartLabelArtTitle">Unlabeled heart blood-flow schematic</title>
-            <desc id="heartLabelArtDesc">A top empty box represents the lungs; a bottom empty box represents the body. Four blank heart chambers make a two-by-two grid, blue on the left and red on the right. Arrows trace blood through the chambers, vessels, lungs, and body. Select the correct names from the label bank.</desc>
+            <desc id="heartLabelArtDesc">Lungs are shown in the upper box and body in the lower box. Label the four chambers, four valves, and the vena cava, pulmonary artery, pulmonary vein, and aorta. Blue chambers show anatomical right; red chambers show anatomical left.</desc>
             <rect width="760" height="480" fill="#f6f6f6"/>
             <rect x="194" y="8" width="340" height="53" fill="#fff" stroke="#111" stroke-width="2"/>
             <rect x="194" y="418" width="340" height="54" fill="#fff" stroke="#111" stroke-width="2"/>
+            <g font-family="Arial,sans-serif" font-weight="700" font-size="27" text-anchor="middle" fill="#161616">
+              <text x="364" y="44">LUNGS</text>
+              <text x="364" y="454">BODY</text>
+            </g>
             <rect x="194" y="132" width="167" height="114" fill="#252ed6"/>
             <rect x="194" y="246" width="167" height="114" fill="#252ed6"/>
             <rect x="361" y="132" width="167" height="114" fill="#f21919"/>
@@ -1351,22 +1355,102 @@ reshuffleHeartOrder();
 
 /* Label-the-heart exercise. Coordinates match the SVG's 760 × 480 reference frame. */
 const HEART_LABEL_SPOTS=[
-  ["lungs","Lungs",254,13,220,44],
-  ["pulmonary","Pulmonary",289,74,155,34],
-  ["pulmonaryArtery","Pulmonary artery",3,56,176,47],
-  ["pulmonaryVein","Pulmonary vein",580,56,175,47],
-  ["deoxygenated","Deoxygenated",2,150,172,43],
-  ["oxygenRich","O₂ rich",583,150,172,43],
-  ["tricuspid","Tricuspid valve",4,220,172,40],
-  ["bicuspid","Bicuspid valve",580,220,174,40],
-  ["venaCava","Vena cava",3,333,174,44],
-  ["aorta","Aorta",580,333,174,44],
-  ["ra","RA",233,164,91,52],
-  ["la","LA",399,164,91,52],
-  ["rv","RV",233,274,91,52],
-  ["lv","LV",399,274,91,52],
-  ["systemic","Systemic",287,377,157,33],
-  ["body","Body",261,424,207,42]
+  [
+    "pulmonaryArtery",
+    "Pulmonary artery",
+    4,
+    71,
+    174,
+    44
+  ],
+  [
+    "pulmonaryVein",
+    "Pulmonary vein",
+    581,
+    71,
+    174,
+    44
+  ],
+  [
+    "venaCava",
+    "Vena cava",
+    4,
+    358,
+    174,
+    44
+  ],
+  [
+    "aorta",
+    "Aorta",
+    581,
+    358,
+    174,
+    44
+  ],
+  [
+    "ra",
+    "Right atrium (RA)",
+    234,
+    156,
+    95,
+    55
+  ],
+  [
+    "la",
+    "Left atrium (LA)",
+    398,
+    156,
+    95,
+    55
+  ],
+  [
+    "rv",
+    "Right ventricle (RV)",
+    234,
+    288,
+    95,
+    55
+  ],
+  [
+    "lv",
+    "Left ventricle (LV)",
+    398,
+    288,
+    95,
+    55
+  ],
+  [
+    "tricuspid",
+    "Tricuspid valve",
+    199,
+    232,
+    160,
+    30
+  ],
+  [
+    "bicuspid",
+    "Bicuspid (mitral) valve",
+    370,
+    232,
+    156,
+    30
+  ],
+  [
+    "pulmonaryValve",
+    "Pulmonary valve",
+    4,
+    265,
+    174,
+    44
+  ],
+  [
+    "aorticValve",
+    "Aortic valve",
+    581,
+    265,
+    174,
+    44
+  ]
 ];
 const heartLabelData=new Map(HEART_LABEL_SPOTS.map(s=>[s[0],{name:s[1],x:s[2],y:s[3],w:s[4],h:s[5]}]));
 const heartLabelNames=HEART_LABEL_SPOTS.map(s=>s[1]);
