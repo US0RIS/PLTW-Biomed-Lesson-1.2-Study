@@ -155,6 +155,47 @@ ul.pts li[data-fid],p[data-fid]{padding:4px 8px;margin-left:-8px}
 .match-actions .buttons{display:flex;flex-wrap:wrap;gap:8px}
 .match-progress{color:var(--muted);font-size:13px}
 @media(max-width:520px){.match-board{gap:28px}.match-choice{font-size:12.5px;padding:9px;min-height:52px}.match-stack{gap:9px}}
+
+/* Mnemonics: look-alike patterns and self-testing cards */
+.mn-hero{border:1px solid var(--line);border-radius:12px;padding:16px 18px;background:var(--soft);margin:0 0 18px}
+.mn-hero strong{display:block;font-size:16px;margin-bottom:4px}
+.mn-hero p{margin:0;color:var(--muted);font-size:14px}
+.mn-section-head{display:flex;gap:12px;align-items:baseline;justify-content:space-between;flex-wrap:wrap;margin:20px 0 10px}
+.mn-section-head h3{font-size:17px;margin:0}
+.mn-section-head small{color:var(--muted)}
+.mn-patterns{display:grid;gap:9px}
+.mn-pattern{border:1px solid var(--line);border-radius:10px;background:var(--panel);overflow:hidden}
+.mn-pattern summary{cursor:pointer;padding:12px 15px;list-style:none;display:flex;gap:10px;align-items:center;justify-content:space-between}
+.mn-pattern summary::-webkit-details-marker{display:none}
+.mn-pattern summary::after{content:"+";font-size:19px;color:var(--accent)}
+.mn-pattern[open] summary::after{content:"−"}
+.mn-pattern summary b{font-size:15px;font-weight:600}
+.mn-pattern summary small{color:var(--muted);font-size:12px;white-space:nowrap}
+.mn-pattern-body{border-top:1px solid var(--line);padding:12px 15px 15px}
+.mn-pattern-hook{font-weight:700;letter-spacing:.02em;font-size:13px;color:var(--accent);margin-bottom:8px}
+.mn-pattern-row{display:grid;grid-template-columns:minmax(105px,29%) 1fr;gap:12px;padding:7px 0;font-size:14px;line-height:1.45;border-bottom:1px solid var(--line)}
+.mn-pattern-row:last-child{border-bottom:0}
+.mn-pattern-row b{font-size:13px}
+.mn-tools{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.mn-tools input{flex:1 1 190px}
+.mn-filter-count{font-size:13px;color:var(--muted);margin:0 0 12px}
+.mn-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,285px),1fr));gap:12px}
+.mn-card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:15px;display:flex;flex-direction:column;gap:11px;min-width:0}
+.mn-card h4{font-size:16px;font-weight:600;margin:0;line-height:1.35}
+.mn-card-topic{font-size:12px;color:var(--muted);line-height:1.3}
+.mn-card-hook{padding:12px;border-radius:8px;background:var(--soft);line-height:1.45;font-size:14px;flex:1}
+.mn-card-hook small{display:block;color:var(--muted);font-size:11px;letter-spacing:.04em;font-weight:600;margin-bottom:3px}
+.mn-answer{background:var(--flag-bg);border-left:3px solid var(--accent);padding:10px 12px;font-size:14px;line-height:1.45;border-radius:4px}
+.mn-card-actions{display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+.mn-card-actions button{font-size:13px;padding:7px 10px}
+.mn-card-actions .mn-know{border-color:var(--good)}
+.mn-card-actions .mn-hard{border-color:var(--bad)}
+.mn-card-actions .active{background:var(--flag-bg);font-weight:600}
+.mn-card-actions .mn-hard.active{background:var(--bad-bg)}
+.mn-card-actions .mn-know.active{background:var(--good-bg)}
+.mn-load{margin:14px 0 0;width:100%}
+.mn-empty{padding:22px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:10px}
+@media(max-width:520px){.mn-pattern-row{grid-template-columns:minmax(88px,35%) 1fr;gap:8px}}
 </style>
 
 <header class="wrap top">
@@ -169,6 +210,7 @@ ul.pts li[data-fid],p[data-fid]{padding:4px 8px;margin-left:-8px}
   <a href="#notes" data-v="notes">Notes</a>
   <a href="#case" data-v="case">Anna's case</a>
   <a href="#terms" data-v="terms">Vocabulary</a>
+  <a href="#mnemonics" data-v="mnemonics">Mnemonics</a>
   <a href="#cards" data-v="cards">Flashcards</a>
   <a href="#match" data-v="match">Matching</a>
   <a href="#quiz" data-v="quiz">Practice quiz</a>
@@ -381,6 +423,34 @@ ul.pts li[data-fid],p[data-fid]{padding:4px 8px;margin-left:-8px}
     <select id="termF" aria-label="Filter by activity"></select>
   </div>
   <dl class="gl" id="termList"></dl>
+</div>
+
+
+<!-- MNEMONICS -->
+<div id="v-mnemonics" data-view hidden>
+  <h2>Mnemonics</h2>
+  <p class="lede">Memory hooks for Lesson 1.2. Learn the difference, then practice recalling each meaning before you reveal it.</p>
+  <div class="mn-hero"><strong>Start with the look-alikes.</strong>
+    <p>First, separate the terms that are easy to confuse. Then use the recall cards for each vocabulary term.</p>
+  </div>
+  <div class="tools">
+    <select id="mnTopic" aria-label="Mnemonic topic"></select>
+    <select id="mnStatus" aria-label="Mnemonic review filter">
+      <option value="unmastered">Not yet mastered</option><option value="all">All terms</option>
+      <option value="hard">Needs practice</option><option value="known">I know these</option>
+    </select>
+  </div>
+  <div class="mn-section-head"><h3>Don't mix these up</h3><small id="mnPatternCount"></small></div>
+  <div class="mn-patterns" id="mnPatterns"></div>
+  <div class="mn-section-head"><h3>Memory hooks for every term</h3><small id="mnProgress" aria-live="polite"></small></div>
+  <p class="lede">Read the hook, say the meaning from memory, and then reveal it. Mark difficult terms as <b>Needs practice</b>; your choices stay saved on this device.</p>
+  <div class="mn-tools">
+    <input id="mnSearch" type="search" placeholder="Find a term or clue" aria-label="Search mnemonics">
+    <button id="mnRevealAll">Show all meanings</button>
+  </div>
+  <div class="mn-filter-count" id="mnCount" role="status" aria-live="polite"></div>
+  <div class="mn-cards" id="mnCards"></div>
+  <button id="mnMore" class="mn-load" hidden>Show 12 more</button>
 </div>
 
 <!-- CARDS -->
@@ -657,7 +727,7 @@ const ACTNAME={"1.2.1":"1.2.1 Autopsy","Body systems":"Body systems","1.2.2":"1.
 $("#sysTable").innerHTML="<tr><th>System</th><th>Function</th><th>Key structures</th></tr>"+SYS.map(s=>`<tr><td class="k">${esc(s[0])}</td><td>${esc(s[1])}</td><td>${esc(s[2])}</td></tr>`).join("");
 
 /* router */
-const VIEWS=["notes","case","terms","cards","match","quiz","workon"];
+const VIEWS=["notes","case","terms","mnemonics","cards","match","quiz","workon"];
 function route(){
   const h=(location.hash||"").slice(1); const v=VIEWS.includes(h)?h:"notes";
   document.querySelectorAll("[data-view]").forEach(el=>el.hidden=el.id!=="v-"+v);
@@ -691,6 +761,86 @@ function renderTerms(){
   $("#termList").innerHTML=list.length?list.map(t=>`<div><dt>${esc(t[0])}<small>${esc(ACTNAME[t[2]])}</small></dt><dd>${esc(t[1])}</dd></div>`).join(""):`<div class="empty">No terms match. Try a shorter search.</div>`;
 }
 $("#termQ").addEventListener("input",renderTerms);$("#termF").addEventListener("change",renderTerms);renderTerms();
+
+
+/* Mnemonics use the existing vocabulary meanings rather than a second definition bank. */
+const MNEMONIC_HOOKS=[["Autopsy","Autopsy: a direct examination of the body after death. Think 'see for yourself'."],["Morgue","Morgue = a PLACE. Autopsy = the procedure."],["Postmortem","POST = after; MORT = death."],["Medical examiner","MEDICAL = physician. A medical examiner is a doctor."],["Coroner","A CORONER is an official who may or may not be a physician."],["Cause of death","CAUSE = WHAT killed them (e.g., a gunshot wound)."],["Mechanism of death","MECHANISM = HOW the body fails (e.g., major blood loss)."],["Manner of death","MANNER = CIRCUMSTANCES (e.g., homicide versus accident)."],["Exsanguination","EX = out; SANGUINE = blood. Extreme blood loss."],["Gross examination","GROSS = big visible picture. No microscope."],["Y incision","Y: two arms from the shoulders, one stem down the torso."],["Anterior","ANTERIOR = AHEAD, the FRONT."],["Posterior","POST = behind or after. POSTERIOR = the BACK."],["Forensic autopsy","FORENSIC = legal investigation of death."],["Clinical autopsy","CLINICAL = disease diagnosis or medical research."],["Decedent","DECEDENT resembles DECEASED."],["Organ system","SYSTEM = a team of organs with one shared job."],["Physiological time of death","PHYSIOLOGY = body functions. The actual time they stopped."],["Estimated time of death","ESTIMATE = inferred from clues, not directly observed."],["Legal time of death","LEGAL = officially LOGGED on the death certificate."],["Algor mortis","ALGOR = body temperature change. A for AMBIENT temperature."],["Rigor mortis","RIGOR = RIGID muscles."],["Livor mortis","LIVOR = LIVID purple. Blood settles downward with gravity."],["Corneal clouding","CORNEA is the eye's clear window; CLOUDING fogs it."],["Decomposition","DE-COMPOSE = break down into smaller parts."],["Scene markers","MARKERS mark the timeline: texts, dishes, a broken clock."],["Body farm","A BODY FARM studies decomposition in different environments."],["Forensic entomologist","ENTOMOLOGY = insects. Insects can help estimate time since death."],["Blowfly","BLOWFLIES arrive early; their development can serve as a clock."],["Postmortem interval","INTERVAL = elapsed TIME SINCE death, not a clock time."],["Glaister equation","Cooling clock: (98.4 − body temperature in °F) ÷ 1.5 ≈ hours since death."],["Ambient temperature","AMBIENT = surrounding air."],["Hypothesis","A HYPOTHESIS is a prediction you can TEST."],["Independent variable","INDEPENDENT = I change it."],["Dependent variable","DEPENDENT = DATA I measure."],["Control group","CONTROL = COMPARISON without the experimental treatment."],["Unit conversion","Convert the UNITS, not the actual quantity."],["Toxicology","TOXIC = poisonous chemicals; -OLOGY = study."],["Toxin","TOXIN = poison made by a living organism."],["Toxicant","TOXICANT = human-made or environmental harmful substance."],["Forensic toxicologist","TOXICOLOGIST = substances IN the body: blood, urine, tissues."],["Forensic chemist","CHEMIST = WHAT is that nonbiological substance, such as a powder?"],["Presumptive test","PRESUME = POSSIBLY. Quick screening, not exact ID."],["Confirmatory test","CONFIRM = more specific identity verification after screening."],["Marquis test","MARQUIS makes a color clue; a PRESUMPTIVE drug test."],["Gas chromatography","CHROMATOGRAPHY SEPARATES a mixture into components."],["Physical digestion","PHYSICAL = mechanical action: chewing, grinding."],["Chemical digestion","CHEMICAL = enzymes and acids breaking molecular bonds."],["Nutrients","NUTRITION = useful substances the body needs."],["Metabolism","METABOLISM = body's chemical processing factory."],["Metabolites","METABOLITES = products formed during metabolism."],["Histology","HISTO = tissue; -LOGY = study."],["Histologist","HISTO = tissue; a histologist examines tissue microscopically."],["Cell","CELL = smallest living building block."],["Tissue","TISSUE = team of similar cells doing one job."],["Organ","ORGAN = several tissues together doing one job."],["Neuron","NEURON = nervous system messaging cell."],["Nervous tissue","NERVOUS = messages transmitted through signals."],["Epithelial tissue","EPI = upon. EPITHELIAL covers and lines surfaces."],["Muscle tissue","MUSCLE = MOTION by contraction."],["Connective tissue","CONNECTIVE = connects and supports structures."],["Central nervous system (CNS)","CENTRAL = command center: brain and spinal cord."],["Peripheral nervous system (PNS)","PERIPHERAL = outer wiring: nerves outside brain/spinal cord."],["Traumatic brain injury (TBI)","TRAUMATIC = external physical force; brain injury."],["Chronic traumatic encephalopathy (CTE)","CHRONIC = long-term; ENCEPHAL = brain. Linked to repeated head impacts."],["Biopsy","BIO = living; -OPSY = examination. Sample from a living person."],["Genome","GENOME = WHOLE set of DNA instructions, not one gene."],["Total magnification","TOTAL = eyepiece × objective. 10× times 40× = 400×."],["Cardiovascular system","CARDIO = heart; VASCULAR = blood vessels. Transport blood."],["Atria","ATRIUM = entry hall. Blood ARRIVES in upper chambers."],["Ventricles","VENTRICLES VENT blood outward: the main pumping chambers."],["Valves","VALVES = one-way doors: prevent backflow."],["Tricuspid valve","TRI = three cusps, RIGHT atrium → right ventricle."],["Mitral valve","MITRAL = BICUSPID, LEFT atrium → left ventricle."],["Pulmonary valve","PULMONARY = LUNGS. Right ventricle → lungs."],["Aortic valve","AORTIC = AORTA. Left ventricle → body."],["Aorta","AORTA = main highway carrying blood from left ventricle to body."],["Pulmonary circulation","PULMONARY = lungs: heart → lungs → heart."],["Systemic circulation","SYSTEMIC = body: heart → body → heart."],["Left ventricular hypertrophy","HYPER = excessive; TROPHY = growth. Thick LEFT ventricle wall."],["Hypertrophic cardiomyopathy","HYPERTROPHIC = thick; CARDIO-MYO-PATHY = heart-muscle disease."],["Septal defect","SEPTUM = dividing wall; DEFECT = hole."],["Bacterial endocarditis","ENDO = inner; CARD = heart; -ITIS = inflammation. Infected lining."],["Sudden cardiac arrest","ARREST = STOP. Heart suddenly stops pumping effectively."],["Digestive system","DIGESTIVE = break down food, absorb nutrients, remove waste."],["Skeletal system","SKELETON = scaffold that supports and protects."],["Muscular system","MUSCLES = MOVEMENT, posture, and heat."],["Nervous system","NERVES = rapid messages; contrast slower hormonal signaling."],["Endocrine system","ENDO = within; CRINE = secrete. Hormones signal body cells."],["Respiratory system","RESPIRE = breathe: O₂ in, CO₂ out."],["Lymphatic / immune system","LYMPH = fluid filtering; IMMUNE = defense."],["Urinary system","URINE = waste in liquid form; water balance too."],["Integumentary system","INTEGUMENT = outer covering: skin, hair, nails."],["Reproductive system","REPRODUCE = make and support new life."]];
+const MNEMONIC_PATTERNS=[["Cause, mechanism, manner","1.2.1","WHAT → HOW → CIRCUMSTANCES",[["CAUSE","What killed them? Gunshot wound."],["MECHANISM","How it killed them? Severe blood loss."],["MANNER","Under what circumstances? Accident, homicide, etc."]]],["Body directions","1.2.1","ANTERIOR = AHEAD; POSTERIOR = BACK",[["ANTERIOR","Front."],["POSTERIOR","Back."]]],["Three times of death","1.2.2","P–E–L: Passed, Estimated, Logged",[["PHYSIOLOGICAL","Actual time functions stopped."],["ESTIMATED","Inferred time."],["LEGAL","Time officially recorded."]]],["Three mortis changes","1.2.2","A–R–L: Ambient, Rigid, Livid",[["ALGOR","Body temperature."],["RIGOR","Muscle stiffness."],["LIVOR","Discoloration from pooled blood."]]],["Experiment variables","1.2.2","I CHANGE → D DATA; CONTROL = COMPARISON",[["INDEPENDENT","What I change."],["DEPENDENT","What I measure."],["CONTROL","Without experimental treatment."]]],["Test certainty","1.2.3","POSSIBLE → VERIFIED",[["PRESUMPTIVE","Quick preliminary screen."],["CONFIRMATORY","More specific identity test."]]],["Toxin versus toxicant","1.2.3","ORGANISM versus CHEMICAL SOURCE",[["TOXIN","Made by a living organism."],["TOXICANT","Human-made or environmental."]]],["Two types of digestion","1.2.3","TEETH versus ENZYMES",[["PHYSICAL","Break into pieces."],["CHEMICAL","Break down molecules."]]],["Build a body","1.2.4","CELL → TISSUE → ORGAN → SYSTEM",[["CELL","Smallest living unit."],["TISSUE","Team of similar cells."],["ORGAN","Several tissues."],["SYSTEM","Several organs."]]],["Four tissue jobs","1.2.4","COVER • CONNECT • CONTRACT • COMMUNICATE",[["EPITHELIAL","Cover surfaces."],["CONNECTIVE","Support and join."],["MUSCLE","Contract."],["NERVOUS","Send signals."]]],["Nervous system geography","1.2.4","C = CENTER; P = PERIPHERY",[["CNS","Brain + spinal cord."],["PNS","Nerves outside CNS."]]],["Brain injuries","1.2.4","INJURY versus CHRONIC DEGENERATION",[["TBI","External-force brain injury."],["CTE","Degenerative disease associated with repeated impacts."]]],["Heart blood flow","1.2.5","RIGHT → LUNGS; LEFT → BODY",[["RIGHT VENTRICLE","Pumps to lungs."],["LEFT VENTRICLE","Pumps to body."],["ATRIA","Receive returning blood."]]],["The four heart valves","1.2.5","TRI RIGHT; MITRAL LEFT",[["TRICUSPID","Right atrium → right ventricle."],["PULMONARY","Right ventricle → lungs."],["MITRAL","Left atrium → left ventricle."],["AORTIC","Left ventricle → body."]]],["LVH versus HCM","1.2.5","FINDING versus DISEASE",[["LVH","Thickened left ventricular wall."],["HCM","Heart-muscle disease causing thickening, often inherited."]]],["Systems by job","Body systems","Remember the FUNCTION, not a list",[["RESPIRATORY","Gas exchange."],["CARDIOVASCULAR","Blood transport."],["DIGESTIVE","Food processing."],["URINARY","Waste and water."],["NERVOUS","Fast signals."],["ENDOCRINE","Hormone signals."],["IMMUNE","Defense."],["INTEGUMENTARY","Protective cover."]]]];
+const mnHookMap=new Map(MNEMONIC_HOOKS);
+const mnSeenTerms=new Set();
+const mnCards=T.map((t)=>({term:t[0],meaning:t[1],topic:t[2],hook:mnHookMap.get(t[0])})).filter(c=>{
+  if(mnSeenTerms.has(c.term))return false;
+  mnSeenTerms.add(c.term);return true;
+}).map((c,i)=>({...c,id:i}));
+let mnMarks={};
+try{
+  const saved=JSON.parse(localStorage.getItem("mm-mnemonics-v1")||"{}");
+  if(saved&&typeof saved==="object"&&!Array.isArray(saved))mnMarks=saved;
+}catch(e){}
+const saveMnMarks=()=>{try{localStorage.setItem("mm-mnemonics-v1",JSON.stringify(mnMarks))}catch(e){}};
+let mnVisible=new Set(),mnAllVisible=false,mnLimit=12;
+$("#mnTopic").innerHTML='<option value="all">All topics</option>'+ACTS.map(a=>'<option value="'+esc(a)+'">'+esc(ACTNAME[a])+'</option>').join("");
+function mnFiltered(){
+  const topic=$("#mnTopic").value,status=$("#mnStatus").value,q=$("#mnSearch").value.trim().toLowerCase();
+  return mnCards.filter(c=>{
+    const mark=mnMarks[c.term]||"";
+    return (topic==="all"||topic===c.topic)&&
+      (status==="all"||(status==="unmastered"&&mark!=="known")||(status==="hard"&&mark==="hard")||(status==="known"&&mark==="known"))&&
+      (!q||(c.term+" "+c.hook+" "+c.meaning).toLowerCase().includes(q));
+  });
+}
+function renderMnPatterns(){
+  const topic=$("#mnTopic").value,shown=MNEMONIC_PATTERNS.filter(p=>topic==="all"||p[1]===topic);
+  $("#mnPatternCount").textContent=shown.length+" quick comparisons";
+  $("#mnPatterns").innerHTML=shown.map((p,i)=>
+    '<details class="mn-pattern"'+(i<3?" open":"")+'><summary><b>'+esc(p[0])+'</b><small>'+esc(ACTNAME[p[1]])+'</small></summary>'+
+    '<div class="mn-pattern-body"><div class="mn-pattern-hook">'+esc(p[2])+'</div>'+
+    p[3].map(pair=>'<div class="mn-pattern-row"><b>'+esc(pair[0])+'</b><span>'+esc(pair[1])+'</span></div>').join("")+
+    '</div></details>'
+  ).join("");
+}
+function renderMnCards(){
+  const selected=mnFiltered();
+  const mastered=mnCards.filter(c=>mnMarks[c.term]==="known").length;
+  const hard=mnCards.filter(c=>mnMarks[c.term]==="hard").length;
+  $("#mnProgress").textContent=mastered+" / "+mnCards.length+" remembered · "+hard+" need practice";
+  $("#mnCount").textContent=selected.length+" terms matching your filters"+(selected.length>mnLimit?" · showing first "+mnLimit:"");
+  $("#mnRevealAll").textContent=mnAllVisible?"Hide all meanings":"Show all meanings";
+  $("#mnCards").innerHTML=selected.slice(0,mnLimit).map(c=>{
+    const mark=mnMarks[c.term]||"",visible=mnAllVisible||mnVisible.has(c.term);
+    return '<article class="mn-card">'+
+      '<div class="mn-card-topic">'+esc(ACTNAME[c.topic]||c.topic)+'</div>'+
+      '<h4>'+esc(c.term)+'</h4>'+
+      '<div class="mn-card-hook"><small>REMEMBER</small>'+esc(c.hook)+'</div>'+
+      (visible?'<div class="mn-answer"><b>Meaning:</b> '+esc(c.meaning)+'</div>':'')+
+      '<div class="mn-card-actions">'+
+      '<button data-mn-reveal="'+c.id+'" aria-expanded="'+visible+'">'+(visible?"Hide meaning":"Reveal meaning")+'</button>'+
+      '<button class="mn-hard'+(mark==="hard"?" active":"")+'" data-mn-mark="hard" data-mn-id="'+c.id+'" aria-pressed="'+(mark==="hard")+'">Needs practice</button>'+
+      '<button class="mn-know'+(mark==="known"?" active":"")+'" data-mn-mark="known" data-mn-id="'+c.id+'" aria-pressed="'+(mark==="known")+'">I know it</button>'+
+      '</div></article>';
+  }).join("")||'<div class="mn-empty">Nothing here yet. Try All terms or change the search.</div>';
+  $("#mnMore").hidden=selected.length<=mnLimit;
+}
+function refreshMn(reset){if(reset)mnLimit=12;renderMnPatterns();renderMnCards()}
+$("#mnTopic").addEventListener("change",()=>refreshMn(true));
+$("#mnStatus").addEventListener("change",()=>{mnLimit=12;renderMnCards()});
+$("#mnSearch").addEventListener("input",()=>{mnLimit=12;renderMnCards()});
+$("#mnRevealAll").addEventListener("click",()=>{mnAllVisible=!mnAllVisible;renderMnCards()});
+$("#mnMore").addEventListener("click",()=>{mnLimit+=12;renderMnCards()});
+$("#mnCards").addEventListener("click",e=>{
+  const reveal=e.target.closest("[data-mn-reveal]"),mark=e.target.closest("[data-mn-mark]");
+  if(reveal){
+    const c=mnCards[Number(reveal.dataset.mnReveal)];
+    if(mnAllVisible){mnAllVisible=false;mnVisible=new Set(mnCards.map(x=>x.term));mnVisible.delete(c.term)}
+    else mnVisible.has(c.term)?mnVisible.delete(c.term):mnVisible.add(c.term);
+    renderMnCards();
+  }else if(mark){
+    const c=mnCards[Number(mark.dataset.mnId)],status=mark.dataset.mnMark;
+    if(mnMarks[c.term]===status)delete mnMarks[c.term];else mnMarks[c.term]=status;
+    saveMnMarks();renderMnCards();
+  }
+});
+refreshMn(true);
 
 /* flashcards */
 $("#cardF").innerHTML=`<option value="all">All terms (${T.length})</option>`+ACTS.map(a=>`<option value="${esc(a)}">${esc(ACTNAME[a])} (${T.filter(t=>t[2]===a).length})</option>`).join("");
