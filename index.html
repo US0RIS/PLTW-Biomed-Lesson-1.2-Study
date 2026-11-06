@@ -246,6 +246,29 @@ ul.pts li[data-fid],p[data-fid]{padding:4px 8px;margin-left:-8px}
 .heart-feedback{min-height:1.5em;font-size:14px;margin:10px 0 0}
 .heart-feedback.ok{color:var(--good)}.heart-feedback.no{color:var(--bad)}
 @media(max-width:520px){.heart-study{padding:13px}.heart-quiz .heart-answers{grid-template-columns:1fr}.heart-rules{grid-template-columns:1fr}}
+
+/* Label the heart: faithful unlabeled blood-flow diagram with responsive answer targets */
+.heart-label-section{margin-top:24px;border-top:1px solid var(--line);padding-top:16px}
+.heart-label-scroll{border:1px solid var(--line);border-radius:10px;overflow-x:auto;background:#f6f6f6}
+.heart-label-canvas{position:relative;aspect-ratio:760 / 480;width:100%;min-width:640px;isolation:isolate}
+.heart-label-canvas svg{display:block;position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.heart-label-target{position:absolute;z-index:1;display:flex;align-items:center;justify-content:center;text-align:center;padding:3px;border:1.5px dashed #68788e;border-radius:5px;background:rgba(255,255,255,.89);font-size:clamp(10px,1.75vw,13px);line-height:1.15;overflow-wrap:anywhere;cursor:pointer;color:#23384a}
+.heart-label-target.filled{background:#fff;border:2px solid #185fa5;font-weight:600}
+.heart-label-target.correct{background:#e2f5df;border-color:#27813b;color:#1d5c27}
+.heart-label-target.wrong{background:#ffe3e3;border-color:#b43131;color:#7f2020}
+.heart-label-target:focus-visible,.heart-label-chip:focus-visible{outline:3px solid #185fa5;outline-offset:2px}
+.heart-label-target .heart-label-slot{opacity:.65;font-size:11px}
+.heart-label-target.filled .heart-label-slot{opacity:1}
+.heart-label-bank{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0}
+.heart-label-chip{font-size:13px;border:1px solid var(--line);padding:7px 10px;background:var(--panel);border-radius:999px;touch-action:manipulation}
+.heart-label-chip.selected{outline:2px solid var(--accent);outline-offset:1px;background:var(--flag-bg)}
+.heart-label-chip.placed{opacity:.55}
+.heart-label-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px}
+.heart-label-feedback{margin:10px 0 0;font-size:14px;min-height:1.5em}
+.heart-label-feedback.ok{color:var(--good)}.heart-label-feedback.no{color:var(--bad)}
+.heart-label-state{font-size:13px;color:var(--muted);margin:9px 0 0}
+.heart-label-correction{font-size:13px;color:var(--muted);margin:8px 0 0}
+@media(max-width:520px){.heart-label-target{font-size:11px}.heart-label-chip{font-size:13px}}
 </style>
 
 <header class="wrap top">
@@ -616,6 +639,63 @@ ul.pts li[data-fid],p[data-fid]{padding:4px 8px;margin-left:-8px}
           <button class="primary" id="heartQuizNext" hidden>Next question →</button>
         </div>
       </div>
+    </div>
+
+    <div class="heart-label-section" id="heartLabelActivity">
+      <h4>Label the heart</h4>
+      <p class="heart-lede">The same four-chamber layout as your reference picture, with all 16 labels removed. Drag a label onto the diagram, or tap a label and then tap its correct location. Check your answers only when you're finished.</p>
+      <div class="heart-label-scroll">
+        <div class="heart-label-canvas" id="heartLabelCanvas" aria-label="Unlabeled blood-flow diagram with sixteen answer locations">
+          <svg viewBox="0 0 760 480" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="heartLabelArtTitle heartLabelArtDesc">
+            <title id="heartLabelArtTitle">Unlabeled heart blood-flow schematic</title>
+            <desc id="heartLabelArtDesc">A top empty box represents the lungs; a bottom empty box represents the body. Four blank heart chambers make a two-by-two grid, blue on the left and red on the right. Arrows trace blood through the chambers, vessels, lungs, and body. Select the correct names from the label bank.</desc>
+            <rect width="760" height="480" fill="#f6f6f6"/>
+            <rect x="194" y="8" width="340" height="53" fill="#fff" stroke="#111" stroke-width="2"/>
+            <rect x="194" y="418" width="340" height="54" fill="#fff" stroke="#111" stroke-width="2"/>
+            <rect x="194" y="132" width="167" height="114" fill="#252ed6"/>
+            <rect x="194" y="246" width="167" height="114" fill="#252ed6"/>
+            <rect x="361" y="132" width="167" height="114" fill="#f21919"/>
+            <rect x="361" y="246" width="167" height="114" fill="#f21919"/>
+            <path d="M361 132 V360 M194 246 H528" fill="none" stroke="#fff" stroke-width="2"/>
+            <g fill="none" stroke="#131313" stroke-width="2.5" stroke-linejoin="round">
+              <path d="M278 204 V242 M270 231 L278 243 L286 231"/>
+              <path d="M445 204 V242 M437 231 L445 243 L453 231"/>
+            </g>
+            <!-- Oxygen-poor return from body to the receiving right atrium -->
+            <g fill="none" stroke="#253bea" stroke-width="2.6" stroke-linejoin="round">
+              <path d="M194 437 H108 V190 H194"/>
+              <path d="M100 364 L108 350 L116 364"/>
+              <path d="M194 302 H154 V35 H194"/>
+              <path d="M167 27 L154 35 L167 43"/>
+              <path d="M101 62 L108 50 L115 62"/>
+              <path d="M110 181 L125 190 L110 199"/>
+              <path d="M175 294 L160 302 L175 310"/>
+            </g>
+            <!-- Oxygen-rich return from lungs to the left atrium and out to body -->
+            <g fill="none" stroke="#ee2424" stroke-width="2.6" stroke-linejoin="round">
+              <path d="M534 35 H620 V190 H528"/>
+              <path d="M612 116 L620 131 L628 116"/>
+              <path d="M547 182 L532 190 L547 198"/>
+              <path d="M528 302 H620 V444 H534"/>
+              <path d="M612 356 L620 371 L628 356"/>
+              <path d="M548 436 L533 444 L548 452"/>
+            </g>
+          </svg>
+          <div id="heartLabelTargets"></div>
+        </div>
+      </div>
+      <p class="heart-caption">Diagram orientation matches the reference: anatomical right (blue) is on the left side of the picture. On narrow screens, swipe the diagram sideways.</p>
+      <p class="heart-label-state" id="heartLabelState" aria-live="polite"></p>
+      <p class="heart-lede" style="margin:8px 0 4px">Labels — choose one, then select a blank location. You can move or remove labels before checking.</p>
+      <div id="heartLabelBank" class="heart-label-bank" aria-label="Available heart labels"></div>
+      <div class="heart-label-controls">
+        <button type="button" id="heartLabelClear">Clear all</button>
+        <button type="button" class="primary" id="heartLabelCheck" disabled>Check answers</button>
+        <button type="button" id="heartLabelRetry" hidden>Retry incorrect</button>
+        <button type="button" id="heartLabelReset">New attempt</button>
+      </div>
+      <p id="heartLabelFeedback" class="heart-label-feedback" role="status" aria-live="polite"></p>
+      <p id="heartLabelCorrection" class="heart-label-correction" hidden></p>
     </div>
   </section>
 
@@ -1128,6 +1208,140 @@ $("#heartQuizNext").addEventListener("click",()=>{
 $("#heartQuizRestart").addEventListener("click",startHeartQuiz);
 renderHeartRoute();
 startHeartQuiz();
+
+
+/* Label-the-heart exercise. Coordinates match the SVG's 760 × 480 reference frame. */
+const HEART_LABEL_SPOTS=[
+  ["lungs","Lungs",254,13,220,44],
+  ["pulmonary","Pulmonary",289,74,155,34],
+  ["pulmonaryArtery","Pulmonary artery",3,56,176,47],
+  ["pulmonaryVein","Pulmonary vein",580,56,175,47],
+  ["deoxygenated","Deoxygenated",2,150,172,43],
+  ["oxygenRich","O₂ rich",583,150,172,43],
+  ["tricuspid","Tricuspid valve",4,220,172,40],
+  ["bicuspid","Bicuspid valve",580,220,174,40],
+  ["venaCava","Vena cava",3,333,174,44],
+  ["aorta","Aorta",580,333,174,44],
+  ["ra","RA",233,164,91,52],
+  ["la","LA",399,164,91,52],
+  ["rv","RV",233,274,91,52],
+  ["lv","LV",399,274,91,52],
+  ["systemic","Systemic",287,377,157,33],
+  ["body","Body",261,424,207,42]
+];
+const heartLabelData=new Map(HEART_LABEL_SPOTS.map(s=>[s[0],{name:s[1],x:s[2],y:s[3],w:s[4],h:s[5]}]));
+const heartLabelNames=HEART_LABEL_SPOTS.map(s=>s[1]);
+let heartLabelAssignments=new Map(),heartLabelSelection=null,heartLabelChecked=false,heartLabelLocked=new Set(),heartLabelDragName=null;
+let heartLabelBankOrder=shuffle(heartLabelNames);
+function updateHeartLabelView(){
+  const used=new Set(heartLabelAssignments.values());
+  const scored=HEART_LABEL_SPOTS.reduce((n,s)=>n+(heartLabelAssignments.get(s[0])===s[1]?1:0),0);
+  $("#heartLabelTargets").innerHTML=HEART_LABEL_SPOTS.map(([id,answer])=>{
+    const spot=heartLabelData.get(id),given=heartLabelAssignments.get(id),isCorrect=heartLabelChecked&&given===answer;
+    const status=heartLabelChecked?(isCorrect?" correct":given?" wrong":""):"";
+    const style='left:'+(spot.x/760*100)+'%;top:'+(spot.y/480*100)+'%;width:'+(spot.w/760*100)+'%;height:'+(spot.h/480*100)+'%';
+    return '<button type="button" class="heart-label-target'+(given?" filled":"")+status+
+      '" style="'+style+'" data-heart-spot="'+esc(id)+'" aria-label="Label location '+(HEART_LABEL_SPOTS.findIndex(s=>s[0]===id)+1)+(given?', currently '+esc(given):', empty')+'"'+(heartLabelChecked||heartLabelLocked.has(id)?" disabled":"")+'>'+
+      '<span class="heart-label-slot">'+(given?esc(given):"?")+'</span></button>';
+  }).join("");
+  $("#heartLabelBank").innerHTML=heartLabelBankOrder.map(name=>{
+    const selected=heartLabelSelection===name,placed=used.has(name);
+    return '<button type="button" class="heart-label-chip'+(selected?" selected":"")+(placed?" placed":"")+'" draggable="'+(!heartLabelChecked&&!heartLabelLocked.has(HEART_LABEL_SPOTS.find(s=>s[1]===name)?.[0]))+'" data-heart-name="'+esc(name)+'" aria-pressed="'+selected+'"'+(heartLabelChecked?" disabled":"")+'>'+esc(name)+'</button>';
+  }).join("");
+  $("#heartLabelState").textContent=heartLabelChecked?
+    scored+" of "+HEART_LABEL_SPOTS.length+" correct":
+    heartLabelAssignments.size+" of "+HEART_LABEL_SPOTS.length+" placed"+(heartLabelSelection?" · selected: "+heartLabelSelection:"");
+  $("#heartLabelCheck").disabled=heartLabelChecked||heartLabelAssignments.size!==HEART_LABEL_SPOTS.length;
+  $("#heartLabelClear").disabled=heartLabelChecked||heartLabelAssignments.size===heartLabelLocked.size;
+  $("#heartLabelRetry").hidden=!heartLabelChecked||scored===HEART_LABEL_SPOTS.length;
+}
+function putHeartLabel(id,name){
+  if(heartLabelChecked||heartLabelLocked.has(id)||!heartLabelData.has(id)||!heartLabelNames.includes(name))return;
+  const previously=[...heartLabelAssignments].find(([key,value])=>value===name);
+  if(previously&&heartLabelLocked.has(previously[0]))return;
+  if(previously)heartLabelAssignments.delete(previously[0]);
+  heartLabelAssignments.set(id,name);
+  heartLabelSelection=null;
+  updateHeartLabelView();
+}
+$("#heartLabelBank").addEventListener("click",e=>{
+  const choice=e.target.closest("[data-heart-name]");
+  if(!choice||heartLabelChecked)return;
+  const name=choice.dataset.heartName;
+  heartLabelSelection=heartLabelSelection===name?null:name;
+  updateHeartLabelView();
+});
+$("#heartLabelTargets").addEventListener("click",e=>{
+  const slot=e.target.closest("[data-heart-spot]");
+  if(!slot||heartLabelChecked)return;
+  const id=slot.dataset.heartSpot;
+  if(heartLabelSelection)putHeartLabel(id,heartLabelSelection);
+  else if(!heartLabelLocked.has(id)){
+    heartLabelAssignments.delete(id);
+    updateHeartLabelView();
+  }
+});
+$("#heartLabelBank").addEventListener("dragstart",e=>{
+  const chip=e.target.closest("[data-heart-name]");
+  if(!chip||heartLabelChecked){e.preventDefault();return}
+  heartLabelDragName=chip.dataset.heartName;
+  if(e.dataTransfer){e.dataTransfer.setData("text/plain",heartLabelDragName);e.dataTransfer.effectAllowed="move"}
+});
+$("#heartLabelBank").addEventListener("dragend",()=>{heartLabelDragName=null});
+$("#heartLabelTargets").addEventListener("dragover",e=>{
+  if(heartLabelChecked||!e.target.closest("[data-heart-spot]"))return;
+  e.preventDefault();
+  if(e.dataTransfer)e.dataTransfer.dropEffect="move";
+});
+$("#heartLabelTargets").addEventListener("drop",e=>{
+  const slot=e.target.closest("[data-heart-spot]");
+  if(!slot||heartLabelChecked)return;
+  e.preventDefault();
+  const name=heartLabelDragName||(e.dataTransfer?e.dataTransfer.getData("text/plain"):"");
+  if(name)putHeartLabel(slot.dataset.heartSpot,name);
+  heartLabelDragName=null;
+});
+function clearHeartLabelActivity(){
+  heartLabelAssignments=new Map();heartLabelSelection=null;heartLabelChecked=false;heartLabelLocked=new Set();
+  $("#heartLabelFeedback").textContent="";
+  $("#heartLabelFeedback").className="heart-label-feedback";
+  $("#heartLabelCorrection").hidden=true;
+  $("#heartLabelCorrection").textContent="";
+  updateHeartLabelView();
+}
+$("#heartLabelClear").addEventListener("click",()=>{
+  if(heartLabelChecked)return;
+  for(const id of [...heartLabelAssignments.keys()])if(!heartLabelLocked.has(id))heartLabelAssignments.delete(id);
+  heartLabelSelection=null;updateHeartLabelView();
+});
+$("#heartLabelCheck").addEventListener("click",()=>{
+  if(heartLabelChecked||heartLabelAssignments.size!==HEART_LABEL_SPOTS.length)return;
+  heartLabelChecked=true;heartLabelSelection=null;
+  const correct=HEART_LABEL_SPOTS.filter(([id,name])=>heartLabelAssignments.get(id)===name);
+  const missed=HEART_LABEL_SPOTS.filter(([id,name])=>heartLabelAssignments.get(id)!==name);
+  $("#heartLabelFeedback").textContent=missed.length?
+    correct.length+" / "+HEART_LABEL_SPOTS.length+" correct. Green labels are right; red labels need another try.":
+    "All "+HEART_LABEL_SPOTS.length+" labels correct.";
+  $("#heartLabelFeedback").className="heart-label-feedback "+(missed.length?"no":"ok");
+  $("#heartLabelCorrection").hidden=!missed.length;
+  $("#heartLabelCorrection").textContent=missed.length?"Review the red locations, then choose Retry incorrect to keep your correct placements.":"";
+  updateHeartLabelView();
+});
+$("#heartLabelRetry").addEventListener("click",()=>{
+  if(!heartLabelChecked)return;
+  heartLabelLocked=new Set(HEART_LABEL_SPOTS.filter(([id,name])=>heartLabelAssignments.get(id)===name).map(s=>s[0]));
+  for(const id of [...heartLabelAssignments.keys()])if(!heartLabelLocked.has(id))heartLabelAssignments.delete(id);
+  heartLabelChecked=false;heartLabelSelection=null;
+  $("#heartLabelFeedback").textContent="Correct labels are locked. Fill the remaining positions and check again.";
+  $("#heartLabelFeedback").className="heart-label-feedback";
+  $("#heartLabelCorrection").hidden=true;
+  updateHeartLabelView();
+});
+$("#heartLabelReset").addEventListener("click",()=>{
+  heartLabelBankOrder=shuffle(heartLabelNames);
+  clearHeartLabelActivity();
+});
+clearHeartLabelActivity();
 
 /* flashcards */
 $("#cardF").innerHTML=`<option value="all">All terms (${T.length})</option>`+ACTS.map(a=>`<option value="${esc(a)}">${esc(ACTNAME[a])} (${T.filter(t=>t[2]===a).length})</option>`).join("");
