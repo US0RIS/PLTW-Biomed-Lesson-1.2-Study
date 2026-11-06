@@ -288,6 +288,9 @@ ul.pts li[data-fid],p[data-fid]{padding:4px 8px;margin-left:-8px}
 .heart-order-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0}
 .heart-order-actions button{font-size:14px}
 .heart-order-status{font-size:14px;color:var(--muted);margin:8px 0;min-height:24px}
+.heart-order-landmark{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 14px;border:1px dashed var(--accent);border-radius:9px;background:var(--flag-bg)}
+.heart-order-landmark b{font-size:14px}
+.heart-order-landmark small{font-size:12px;color:var(--muted)}
 .heart-order-status.ok{color:var(--good)}.heart-order-status.no{color:var(--bad)}
 .heart-order-answer{border:1px solid var(--line);border-radius:9px;padding:10px 16px;background:var(--soft);font-size:13px;line-height:1.7;margin-top:12px}
 .heart-order-answer ol{margin:4px 0 0;padding-left:22px}
@@ -648,7 +651,7 @@ ul.pts li[data-fid],p[data-fid]{padding:4px 8px;margin-left:-8px}
     </div>
 
     <h4>What comes next?</h4>
-    <p class="heart-lede">15 questions, one for each stop in the blood-flow circuit. Pick a structure and press <b>Check answer</b>; the answer is not revealed until submission.</p>
+    <p class="heart-lede">14 questions covering the same 12 anatomical labels plus the body and lungs as landmarks. Pick a structure and press <b>Check answer</b>; the answer is not revealed until submission.</p>
     <div class="heart-quiz" id="heartQuiz">
       <div class="heart-quiz-status" id="heartQuizProgress"></div>
       <div class="heart-question" id="heartQuizQuestion"></div>
@@ -667,9 +670,9 @@ ul.pts li[data-fid],p[data-fid]{padding:4px 8px;margin-left:-8px}
 
     <div class="heart-order-activity" id="heartOrderActivity">
       <h4>Put blood flow in order</h4>
-      <p class="heart-lede">Arrange every stop a blood cell passes, from the body through the right heart, lungs, left heart, and back to the body. Drag steps into position, tap two steps to swap them, or use the up/down arrows. Answers are graded only when you submit.</p>
+      <p class="heart-lede">Arrange the same 12 anatomical labels from the heart diagram. Body and Lungs stay fixed as landmarks. Drag to reorder, tap two steps to swap, or use ↑ ↓. Check only when you submit.</p>
       <p class="heart-order-status" id="heartOrderStatus" role="status" aria-live="polite"></p>
-      <div id="heartOrderList" class="heart-order-list" aria-label="Reorder the fifteen blood-flow stages"></div>
+      <div id="heartOrderList" class="heart-order-list" aria-label="Order the twelve anatomical structures between fixed Body and Lungs landmarks"></div>
       <div class="heart-order-actions">
         <button class="primary" id="heartOrderCheck" type="button">Check order</button>
         <button id="heartOrderShuffle" type="button">Shuffle again</button>
@@ -1154,29 +1157,98 @@ refreshMn(true);
 
 /* Heart structure and blood flow, with submit-to-check practice. */
 const HEART_FLOW=[
-  {name:"Body tissues",kind:"organ",oxygen:"low",explain:"Body tissues use oxygen. Blood returning from the tissues is relatively oxygen-poor. From here it enters systemic veins."},
-  {name:"Superior + inferior vena cava",kind:"vessel",oxygen:"low",explain:"The superior vena cava returns blood from the upper body; the inferior vena cava returns blood from the lower body. Both empty into the right atrium."},
-  {name:"Right atrium",kind:"chamber",oxygen:"low",explain:"The right atrium receives systemic venous blood. ATRIA = ARRIVE; this is the receiving chamber on the body's right side."},
-  {name:"Tricuspid valve",kind:"valve",oxygen:"low",explain:"The tricuspid (right atrioventricular) valve lets blood pass into the right ventricle and prevents backward flow. TRI = RIGHT."},
-  {name:"Right ventricle",kind:"chamber",oxygen:"low",explain:"The right ventricle contracts to send oxygen-poor blood toward the lungs. RIGHT → LUNGS."},
-  {name:"Pulmonary valve",kind:"valve",oxygen:"low",explain:"The pulmonary semilunar valve lies between the right ventricle and the pulmonary trunk."},
-  {name:"Pulmonary trunk",kind:"vessel",oxygen:"low",explain:"This large vessel leaves the right ventricle and branches into the right and left pulmonary arteries."},
-  {name:"Right + left pulmonary arteries",kind:"vessel",oxygen:"low",explain:"These arteries carry oxygen-poor blood AWAY from the heart to the lungs. This is the important artery/oxygen exception."},
-  {name:"Lung capillaries",kind:"organ",oxygen:"transition",explain:"Gas exchange happens here: blood releases carbon dioxide and picks up oxygen. This is the transition from oxygen-poor to oxygen-rich blood."},
-  {name:"Pulmonary veins",kind:"vessel",oxygen:"high",explain:"Pulmonary veins carry oxygen-rich blood BACK to the heart, entering the left atrium. This is the important vein/oxygen exception."},
-  {name:"Left atrium",kind:"chamber",oxygen:"high",explain:"The left atrium RECEIVES oxygen-rich blood returning from the lungs."},
-  {name:"Mitral (bicuspid) valve",kind:"valve",oxygen:"high",explain:"The mitral valve (also called bicuspid or left AV valve) leads into the left ventricle. BI = LEFT."},
-  {name:"Left ventricle",kind:"chamber",oxygen:"high",explain:"Its thick muscular wall pumps oxygen-rich blood at high pressure to the entire body. LEFT → BODY."},
-  {name:"Aortic valve",kind:"valve",oxygen:"high",explain:"The aortic semilunar valve controls outflow from the left ventricle into the aorta and prevents backflow."},
-  {name:"Aorta",kind:"vessel",oxygen:"high",explain:"The aorta distributes oxygen-rich blood through the systemic arteries to body tissues. The route then repeats."}
+  {
+    "name": "Body",
+    "kind": "landmark",
+    "oxygen": "low",
+    "explain": "Blood returns from the body after delivering oxygen. From here it goes through systemic veins to the vena cava."
+  },
+  {
+    "name": "Vena cava",
+    "kind": "vessel",
+    "oxygen": "low",
+    "explain": "The superior and inferior venae cavae bring blood from the body into the right atrium. CAVA = coming back."
+  },
+  {
+    "name": "Right atrium (RA)",
+    "kind": "chamber",
+    "oxygen": "low",
+    "explain": "The right atrium receives blood from the vena cava. Atria = arrive."
+  },
+  {
+    "name": "Tricuspid valve",
+    "kind": "valve",
+    "oxygen": "low",
+    "explain": "Blood passes from the right atrium through the tricuspid valve into the right ventricle. TRI = right."
+  },
+  {
+    "name": "Right ventricle (RV)",
+    "kind": "chamber",
+    "oxygen": "low",
+    "explain": "The right ventricle pumps oxygen-poor blood toward the lungs. RIGHT = LUNGS."
+  },
+  {
+    "name": "Pulmonary valve",
+    "kind": "valve",
+    "oxygen": "low",
+    "explain": "Blood passes through the pulmonary valve as it leaves the right ventricle toward the pulmonary artery."
+  },
+  {
+    "name": "Pulmonary artery",
+    "kind": "vessel",
+    "oxygen": "low",
+    "explain": "The pulmonary artery carries blood away from the right ventricle to the lungs. Pulmonary = lungs."
+  },
+  {
+    "name": "Lungs",
+    "kind": "landmark",
+    "oxygen": "transition",
+    "explain": "In the lungs, blood releases carbon dioxide and picks up oxygen, then returns through the pulmonary veins."
+  },
+  {
+    "name": "Pulmonary vein",
+    "kind": "vessel",
+    "oxygen": "high",
+    "explain": "The pulmonary veins carry oxygen-rich blood from the lungs back to the left atrium. Veins return to the heart."
+  },
+  {
+    "name": "Left atrium (LA)",
+    "kind": "chamber",
+    "oxygen": "high",
+    "explain": "The left atrium receives blood returning from the lungs. Atria = arrive."
+  },
+  {
+    "name": "Bicuspid (mitral) valve",
+    "kind": "valve",
+    "oxygen": "high",
+    "explain": "Blood moves from the left atrium through the bicuspid (mitral) valve to the left ventricle. BI = left."
+  },
+  {
+    "name": "Left ventricle (LV)",
+    "kind": "chamber",
+    "oxygen": "high",
+    "explain": "The left ventricle pumps oxygen-rich blood to the body. LEFT = BODY."
+  },
+  {
+    "name": "Aortic valve",
+    "kind": "valve",
+    "oxygen": "high",
+    "explain": "Blood passes through the aortic valve leaving the left ventricle to enter the aorta."
+  },
+  {
+    "name": "Aorta",
+    "kind": "vessel",
+    "oxygen": "high",
+    "explain": "The aorta carries oxygen-rich blood from the left ventricle out to the body. Then the cycle repeats."
+  }
 ];
 let heartCurrent=0,heartHidden=false;
 function renderHeartRoute(){
   const stage=(s,i)=>
     '<button type="button" class="heart-stage" data-heart-stage="'+i+'" aria-pressed="'+(heartCurrent===i)+'">'+esc(s.name)+'</button>';
   const lane=(list,start)=>list.map((s,j)=>(j?'<span class="heart-arrow" aria-hidden="true">→</span>':"")+stage(s,j+start)).join("");
-  $("#heartLowSteps").innerHTML=lane(HEART_FLOW.slice(0,9),0);
-  $("#heartHighSteps").innerHTML=lane(HEART_FLOW.slice(9),9)+'<span class="heart-arrow" aria-hidden="true">→ Body ↻</span>';
+  $("#heartLowSteps").innerHTML=lane(HEART_FLOW.slice(0,8),0);
+  $("#heartHighSteps").innerHTML=lane(HEART_FLOW.slice(8),8)+'<span class="heart-arrow" aria-hidden="true">→ Body ↻</span>';
   const current=HEART_FLOW[heartCurrent];
   $("#heartStageInfo").innerHTML='<small>Stop '+(heartCurrent+1)+' of '+HEART_FLOW.length+' · '+(current.oxygen==="low"?"Oxygen-poor":current.oxygen==="high"?"Oxygen-rich":"Gas exchange")+'</small><b>'+esc(current.name)+'</b><p>'+esc(current.explain)+'</p>';
   $("#heartRoute").hidden=heartHidden;
@@ -1254,10 +1326,12 @@ startHeartQuiz();
 
 
 
-/* Put blood flow in order: same 15 structures as the reference route above. */
+/* Put blood flow in order: the same 12 labels as the diagram, with fixed Body/Lungs landmarks. */
+const HEART_ORDER_STEPS=HEART_FLOW.map((step,i)=>({...step,flowIndex:i})).filter(step=>step.kind!=="landmark");
+const HEART_LUNG_POSITION=HEART_ORDER_STEPS.findIndex(s=>s.oxygen==="high");
 let heartOrder=[],heartOrderSelected=null,heartOrderGraded=false,heartOrderDragged=null;
 function reshuffleHeartOrder(){
-  const base=HEART_FLOW.map((_,i)=>i);
+  const base=HEART_ORDER_STEPS.map((_,i)=>i);
   heartOrder=shuffle(base);
   if(heartOrder.every((n,i)=>n===i))heartOrder.push(heartOrder.shift());
   heartOrderSelected=null;heartOrderGraded=false;heartOrderDragged=null;
@@ -1265,22 +1339,27 @@ function reshuffleHeartOrder(){
   renderHeartOrder();
 }
 function renderHeartOrder(){
+  const total=HEART_ORDER_STEPS.length;
   const correct=heartOrder.filter((n,i)=>n===i).length;
-  $("#heartOrderList").innerHTML=heartOrder.map((idx,pos)=>{
+  const fixed=(name,caption)=>'<div class="heart-order-landmark"><b>'+esc(name)+'</b><small>'+esc(caption)+'</small></div>';
+  const entries=heartOrder.map((idx,pos)=>{
+    const term=HEART_ORDER_STEPS[idx].name;
     const status=heartOrderGraded?(idx===pos?" correct":" incorrect"):"";
     const selected=pos===heartOrderSelected;
-    return '<div class="heart-order-item'+status+(selected?" selected":"")+'" data-heart-order-pos="'+pos+'" draggable="true">'+
+    const item='<div class="heart-order-item'+status+(selected?" selected":"")+'" data-heart-order-pos="'+pos+'" draggable="true">'+
       '<span class="heart-order-grip" aria-hidden="true">⠿</span>'+
       '<span class="heart-order-num">'+(pos+1)+'.</span>'+
-      '<button type="button" class="heart-order-pick" data-heart-order-pick="'+pos+'" aria-pressed="'+selected+'" aria-label="Position '+(pos+1)+': '+esc(HEART_FLOW[idx].name)+'. Select to swap">'+esc(HEART_FLOW[idx].name)+'</button>'+
-      '<button type="button" class="heart-order-move" data-heart-order-up="'+pos+'" aria-label="Move '+esc(HEART_FLOW[idx].name)+' up"'+(pos===0?" disabled":"")+'>↑</button>'+
-      '<button type="button" class="heart-order-move" data-heart-order-down="'+pos+'" aria-label="Move '+esc(HEART_FLOW[idx].name)+' down"'+(pos===heartOrder.length-1?" disabled":"")+'>↓</button>'+
+      '<button type="button" class="heart-order-pick" data-heart-order-pick="'+pos+'" aria-pressed="'+selected+'" aria-label="Position '+(pos+1)+': '+esc(term)+'. Select to swap">'+esc(term)+'</button>'+
+      '<button type="button" class="heart-order-move" data-heart-order-up="'+pos+'" aria-label="Move '+esc(term)+' up"'+(pos===0?" disabled":"")+'>↑</button>'+
+      '<button type="button" class="heart-order-move" data-heart-order-down="'+pos+'" aria-label="Move '+esc(term)+' down"'+(pos===total-1?" disabled":"")+'>↓</button>'+
       '</div>';
+    return (pos===HEART_LUNG_POSITION?fixed("LUNGS","Fixed landmark · oxygen enters blood"):"")+item;
   }).join("");
+  $("#heartOrderList").innerHTML=fixed("BODY","Fixed starting point")+entries+fixed("BODY","Blood returns here; the loop repeats");
   $("#heartOrderStatus").textContent=heartOrderGraded?
-    correct+" / "+heartOrder.length+" in the correct position. "+(correct===heartOrder.length?"Entire circuit correct.":"Red steps are out of place; rearrange and check again."):
-    heartOrderSelected===null?"Select two stages to swap, drag one to a new position, or use ↑ ↓.":"Selected position "+(heartOrderSelected+1)+". Select a second position to swap.";
-  $("#heartOrderStatus").className="heart-order-status"+(heartOrderGraded?(correct===heartOrder.length?" ok":" no"):"");
+    correct+" / "+total+" anatomical labels in the correct position. "+(correct===total?"Entire circuit correct.":"Red steps are out of place; rearrange and check again."):
+    heartOrderSelected===null?"Body and Lungs are fixed. Select two labels to swap, drag, or use ↑ ↓.":"Selected position "+(heartOrderSelected+1)+". Select a second label to swap.";
+  $("#heartOrderStatus").className="heart-order-status"+(heartOrderGraded?(correct===total?" ok":" no"):"");
   $("#heartOrderReveal").hidden=!heartOrderGraded;
 }
 function updateHeartOrder(order){
