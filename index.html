@@ -196,6 +196,56 @@ ul.pts li[data-fid],p[data-fid]{padding:4px 8px;margin-left:-8px}
 .mn-load{margin:14px 0 0;width:100%}
 .mn-empty{padding:22px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:10px}
 @media(max-width:520px){.mn-pattern-row{grid-template-columns:minmax(88px,35%) 1fr;gap:8px}}
+
+/* Heart structure: a schematic, a guided blood-flow route, and recall practice */
+.heart-study{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:20px;margin:18px 0 26px}
+.heart-study h3{font-size:21px;margin:0 0 6px}
+.heart-study h4{font-size:16px;margin:20px 0 8px}
+.heart-study .heart-lede{font-size:14px;color:var(--muted);margin-bottom:12px}
+.heart-key{display:flex;gap:10px 18px;align-items:center;flex-wrap:wrap;font-size:13px;margin:8px 0 12px}
+.heart-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:middle}
+.heart-dot.low{background:#387fb8}.heart-dot.high{background:#c35465}
+.heart-diagram-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:#f8fafc;margin:10px 0 8px}
+.heart-diagram-scroll svg{display:block;width:100%;min-width:640px;height:auto}
+.heart-caption{font-size:12px;color:var(--muted);line-height:1.4;margin-bottom:14px}
+.heart-rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:9px}
+.heart-rule{border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:13px;line-height:1.4}
+.heart-rule b{display:block;font-size:14px;margin-bottom:3px}
+.heart-route-tools{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:8px 0}
+.heart-route-tools .heart-instruction{font-size:13px;color:var(--muted)}
+.heart-route-parts{display:grid;gap:11px}
+.heart-lane{border:1px solid var(--line);border-radius:9px;padding:12px}
+.heart-lane-head{font-size:13px;font-weight:700;margin:0 0 9px}
+.heart-lane.heart-low{border-left:4px solid #387fb8;background:rgba(56,127,184,.055)}
+.heart-lane.heart-high{border-left:4px solid #c35465;background:rgba(195,84,101,.055)}
+.heart-lane .heart-pills{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.heart-stage{font-size:13px;padding:7px 9px;max-width:100%;white-space:normal;line-height:1.32;text-align:left}
+.heart-stage[aria-pressed=true]{border-color:var(--accent);outline:2px solid var(--accent);outline-offset:1px;background:var(--flag-bg)}
+.heart-arrow{font-size:15px;color:var(--muted);user-select:none}
+.heart-stage-detail{background:var(--soft);border-radius:9px;padding:12px 14px;margin:12px 0 0;min-height:80px}
+.heart-stage-detail b{display:block;font-size:16px}
+.heart-stage-detail p{margin:4px 0 0;font-size:14px}
+.heart-stage-detail small{font-size:12px;color:var(--muted)}
+.heart-parts{display:grid;gap:9px}
+.heart-parts details{border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.heart-parts summary{cursor:pointer;font-weight:600;padding:10px 13px}
+.heart-parts .heart-parts-body{padding:0 13px 11px}
+.heart-parts dl{margin:0}
+.heart-parts dl div{padding:8px 0;border-top:1px solid var(--line);font-size:13px;line-height:1.45}
+.heart-parts dt{font-weight:600}
+.heart-parts dd{color:var(--ink)}
+.heart-quiz{border:1px solid var(--line);border-radius:10px;padding:14px;background:var(--panel)}
+.heart-quiz .heart-question{font-size:16px;font-weight:600;margin:7px 0 10px}
+.heart-quiz .heart-answers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.heart-quiz .heart-option{font-size:14px;text-align:left;line-height:1.35;padding:10px}
+.heart-option[aria-pressed=true]{border-color:var(--accent);background:var(--flag-bg)}
+.heart-option.heart-correct{border-color:var(--good);background:var(--good-bg)}
+.heart-option.heart-incorrect{border-color:var(--bad);background:var(--bad-bg)}
+.heart-quiz .heart-quiz-bar{display:flex;align-items:center;justify-content:space-between;gap:9px;flex-wrap:wrap;margin:13px 0 0}
+.heart-quiz .heart-quiz-status{font-size:13px;color:var(--muted)}
+.heart-feedback{min-height:1.5em;font-size:14px;margin:10px 0 0}
+.heart-feedback.ok{color:var(--good)}.heart-feedback.no{color:var(--bad)}
+@media(max-width:520px){.heart-study{padding:13px}.heart-quiz .heart-answers{grid-template-columns:1fr}.heart-rules{grid-template-columns:1fr}}
 </style>
 
 <header class="wrap top">
@@ -433,6 +483,142 @@ ul.pts li[data-fid],p[data-fid]{padding:4px 8px;margin-left:-8px}
   <div class="mn-hero"><strong>Start with the look-alikes.</strong>
     <p>First, separate the terms that are easy to confuse. Then use the recall cards for each vocabulary term.</p>
   </div>
+
+  <!-- HEART ANATOMY -->
+  <section class="heart-study" id="heartStudy" aria-labelledby="heartTitle">
+    <h3 id="heartTitle">Heart anatomy &amp; blood flow</h3>
+    <p class="heart-lede">Learn where each part sits, what it does, and the exact order blood travels. Start by reading the circuit; then hide it and test your memory.</p>
+    <div class="heart-key">
+      <span><i class="heart-dot low"></i>Oxygen-poor blood</span>
+      <span><i class="heart-dot high"></i>Oxygen-rich blood</span>
+    </div>
+    <div class="heart-diagram-scroll">
+      <svg viewBox="0 0 760 380" role="img" aria-labelledby="heartSvgTitle heartSvgDesc" xmlns="http://www.w3.org/2000/svg">
+        <title id="heartSvgTitle">Four chambers of the heart and major vessels</title>
+        <desc id="heartSvgDesc">Schematic front view: the body's right side is shown on the left. The right atrium receives blood from the superior and inferior vena cava and sends it through the tricuspid valve to the right ventricle. The right ventricle sends blood through the pulmonary valve into the pulmonary trunk and arteries toward the lungs. Pulmonary veins return oxygenated blood to the left atrium, which passes it through the mitral valve to the left ventricle. The left ventricle sends it through the aortic valve into the aorta toward the body. The septum divides the sides.</desc>
+        <rect x="180" y="88" width="417" height="268" rx="22" fill="#eef2f5" stroke="#b7c3cc" stroke-width="2"/>
+        <rect x="195" y="106" width="174" height="98" rx="15" fill="#d9eafa" stroke="#4a87ba" stroke-width="2"/>
+        <rect x="195" y="239" width="174" height="98" rx="15" fill="#d9eafa" stroke="#4a87ba" stroke-width="2"/>
+        <rect x="410" y="106" width="172" height="98" rx="15" fill="#fbe3e6" stroke="#be5767" stroke-width="2"/>
+        <rect x="410" y="239" width="172" height="98" rx="15" fill="#fbe3e6" stroke="#be5767" stroke-width="2"/>
+        <path d="M390 95 V346" stroke="#8b959e" stroke-width="5" stroke-dasharray="9 6"/>
+        <g font-family="Arial,sans-serif" text-anchor="middle" fill="#182b3a">
+          <text x="282" y="148" font-size="17" font-weight="700">RIGHT ATRIUM</text>
+          <text x="282" y="173" font-size="13">Receives blood</text>
+          <text x="282" y="281" font-size="17" font-weight="700">RIGHT VENTRICLE</text>
+          <text x="282" y="304" font-size="13">Pumps to lungs</text>
+          <text x="496" y="148" font-size="17" font-weight="700">LEFT ATRIUM</text>
+          <text x="496" y="173" font-size="13">Receives from lungs</text>
+          <text x="496" y="281" font-size="17" font-weight="700">LEFT VENTRICLE</text>
+          <text x="496" y="304" font-size="13">Pumps to body</text>
+          <text x="282" y="224" font-size="14" font-weight="700" fill="#1c669b">↓ Tricuspid valve</text>
+          <text x="496" y="224" font-size="14" font-weight="700" fill="#ad374c">↓ Mitral valve</text>
+        </g>
+        <g font-family="Arial,sans-serif" font-size="13" font-weight="600" text-anchor="middle">
+          <rect x="8" y="71" width="153" height="43" rx="8" fill="#d9eafa" stroke="#4a87ba"/>
+          <text x="84" y="89" fill="#174e79">Superior vena cava</text>
+          <text x="84" y="106" fill="#174e79">(upper body)</text>
+          <path d="M161 93 L190 128" stroke="#387fb8" stroke-width="3" fill="none"/>
+          <rect x="8" y="277" width="153" height="43" rx="8" fill="#d9eafa" stroke="#4a87ba"/>
+          <text x="84" y="295" fill="#174e79">Inferior vena cava</text>
+          <text x="84" y="312" fill="#174e79">(lower body)</text>
+          <path d="M161 297 L171 297 L171 184 L193 184" stroke="#387fb8" stroke-width="3" fill="none"/>
+          <rect x="173" y="13" width="202" height="54" rx="8" fill="#d9eafa" stroke="#4a87ba"/>
+          <text x="274" y="32" fill="#174e79">Pulmonary valve → trunk</text>
+          <text x="274" y="49" fill="#174e79">→ R/L pulmonary arteries</text>
+          <path d="M304 67 L304 86" stroke="#387fb8" stroke-width="2" fill="none" stroke-dasharray="4 4"/>
+          <rect x="408" y="13" width="173" height="54" rx="8" fill="#fbe3e6" stroke="#be5767"/>
+          <text x="495" y="32" fill="#9a3446">Pulmonary veins</text>
+          <text x="495" y="49" fill="#9a3446">(from lungs)</text>
+          <path d="M495 67 L495 103" stroke="#c35465" stroke-width="2.5" fill="none"/>
+          <rect x="605" y="253" width="145" height="64" rx="8" fill="#fbe3e6" stroke="#be5767"/>
+          <text x="677" y="273" fill="#9a3446">Aortic valve</text>
+          <text x="677" y="291" fill="#9a3446">→ Aorta</text>
+          <text x="677" y="309" fill="#9a3446">(to body)</text>
+          <path d="M584 289 L603 289" stroke="#c35465" stroke-width="3" fill="none"/>
+          <text x="389" y="370" font-size="13" fill="#53616d">Septum = dividing wall</text>
+        </g>
+      </svg>
+    </div>
+    <p class="heart-caption">Simplified identification diagram, not to scale. Anatomical right appears on your left. Vessel callouts name the connections; use the route below for the exact order of flow.</p>
+
+    <div class="heart-rules">
+      <div class="heart-rule"><b>Atria = ARRIVE</b>The atria receive blood; ventricles pump it out.</div>
+      <div class="heart-rule"><b>RIGHT → LUNGS; LEFT → BODY</b>Right side is the pulmonary pump. Left side is the systemic pump.</div>
+      <div class="heart-rule"><b>Arteries go AWAY</b>Arteries leave the heart; veins return—even when their oxygen levels are unusual.</div>
+    </div>
+
+    <h4>Follow one drop of blood</h4>
+    <div class="heart-route-tools">
+      <span class="heart-instruction">Select any structure to see what it does.</span>
+      <button id="heartHideRoute" aria-pressed="false">Hide route for practice</button>
+    </div>
+    <div id="heartRoute" class="heart-route-parts">
+      <div class="heart-lane heart-low">
+        <div class="heart-lane-head">1. Body → right heart → lungs (oxygen-poor)</div>
+        <div id="heartLowSteps" class="heart-pills"></div>
+      </div>
+      <div class="heart-lane heart-high">
+        <div class="heart-lane-head">2. Lungs → left heart → body (oxygen-rich)</div>
+        <div id="heartHighSteps" class="heart-pills"></div>
+      </div>
+    </div>
+    <div class="heart-stage-detail" id="heartStageInfo" role="status" aria-live="polite"></div>
+
+    <h4>Identify the parts</h4>
+    <p class="heart-lede">The route is the most important thing to memorize. Use these groups to identify the structures and their functions.</p>
+    <div class="heart-parts">
+      <details open><summary>Four chambers</summary><div class="heart-parts-body"><dl>
+        <div><dt>Right atrium (RA)</dt><dd>Upper right chamber. Receives oxygen-poor blood from the superior and inferior vena cava (and blood returning from the heart muscle through the coronary sinus).</dd></div>
+        <div><dt>Right ventricle (RV)</dt><dd>Lower right chamber. Pumps oxygen-poor blood into the pulmonary trunk toward the lungs.</dd></div>
+        <div><dt>Left atrium (LA)</dt><dd>Upper left chamber. Receives oxygen-rich blood from the pulmonary veins.</dd></div>
+        <div><dt>Left ventricle (LV)</dt><dd>Lower left chamber. Has a thick muscular wall to pump oxygen-rich blood into the aorta and around the body.</dd></div>
+      </dl></div></details>
+      <details open><summary>Four one-way valves</summary><div class="heart-parts-body"><dl>
+        <div><dt>Tricuspid (right AV) valve</dt><dd>Between right atrium and right ventricle. <b>TRI = RIGHT.</b></dd></div>
+        <div><dt>Pulmonary (semilunar) valve</dt><dd>Between right ventricle and pulmonary trunk. Blood leaves for the lungs.</dd></div>
+        <div><dt>Mitral / bicuspid (left AV) valve</dt><dd>Between left atrium and left ventricle. <b>BI = LEFT.</b></dd></div>
+        <div><dt>Aortic (semilunar) valve</dt><dd>Between left ventricle and aorta. Blood leaves for the body.</dd></div>
+      </dl></div></details>
+      <details open><summary>Major blood vessels and two circuits</summary><div class="heart-parts-body"><dl>
+        <div><dt>Superior vena cava (SVC)</dt><dd>Returns oxygen-poor blood from the upper body to the right atrium.</dd></div>
+        <div><dt>Inferior vena cava (IVC)</dt><dd>Returns oxygen-poor blood from the lower body to the right atrium.</dd></div>
+        <div><dt>Pulmonary trunk and right/left pulmonary arteries</dt><dd>Carry oxygen-poor blood from the right ventricle to the lungs. An artery carries blood <b>away</b> from the heart, not necessarily oxygen-rich blood.</dd></div>
+        <div><dt>Pulmonary veins</dt><dd>Carry oxygen-rich blood from the lungs to the left atrium (typically four veins). A vein returns blood <b>to</b> the heart.</dd></div>
+        <div><dt>Aorta</dt><dd>Main artery carrying oxygen-rich blood from the left ventricle to the body.</dd></div>
+        <div><dt>Pulmonary circuit</dt><dd>Right heart → lungs → left heart, for gas exchange.</dd></div>
+        <div><dt>Systemic circuit</dt><dd>Left heart → body tissues → right heart, for delivery and return.</dd></div>
+      </dl></div></details>
+      <details><summary>Supporting structures (extra labels)</summary><div class="heart-parts-body"><dl>
+        <div><dt>Interatrial and interventricular septa</dt><dd>Walls separating the right and left atria and ventricles. <b>SEPT = separate.</b></dd></div>
+        <div><dt>Chordae tendineae (“heart strings”)</dt><dd>Tendon-like cords securing the tricuspid and mitral valve leaflets to papillary muscles; they prevent the leaflets from flipping backward.</dd></div>
+        <div><dt>Papillary muscles</dt><dd>Ventricular muscles attached to chordae tendineae. They stabilize the AV valves during contraction.</dd></div>
+        <div><dt>Myocardium</dt><dd>Heart muscle layer that contracts to pump blood. <b>MYO = muscle.</b></dd></div>
+        <div><dt>Endocardium / epicardium / pericardium</dt><dd>Inner heart lining / outer surface layer / surrounding sac. <b>ENDO = inside; EPI = upon; PERI = around.</b></dd></div>
+        <div><dt>Coronary arteries, coronary veins, coronary sinus</dt><dd>Supply the heart muscle itself and return its venous blood to the right atrium.</dd></div>
+        <div><dt>Apex and base</dt><dd>Apex = pointed lower tip (mostly LV). Base = broader upper posterior part where major vessels connect.</dd></div>
+        <div><dt>Electrical conduction structures</dt><dd>SA node → AV node → bundle of His → right/left bundle branches → Purkinje fibers. These coordinate the heartbeat.</dd></div>
+      </dl></div></details>
+    </div>
+
+    <h4>What comes next?</h4>
+    <p class="heart-lede">15 questions, one for each stop in the blood-flow circuit. Pick a structure and press <b>Check answer</b>; the answer is not revealed until submission.</p>
+    <div class="heart-quiz" id="heartQuiz">
+      <div class="heart-quiz-status" id="heartQuizProgress"></div>
+      <div class="heart-question" id="heartQuizQuestion"></div>
+      <div class="heart-answers" id="heartQuizOptions"></div>
+      <div class="heart-feedback" id="heartQuizFeedback" role="status" aria-live="polite"></div>
+      <div class="heart-quiz-bar">
+        <span class="heart-quiz-status" id="heartQuizScore"></span>
+        <div>
+          <button id="heartQuizRestart">Restart</button>
+          <button class="primary" id="heartQuizCheck" disabled>Check answer</button>
+          <button class="primary" id="heartQuizNext" hidden>Next question →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <div class="tools">
     <select id="mnTopic" aria-label="Mnemonic topic"></select>
     <select id="mnStatus" aria-label="Mnemonic review filter">
@@ -841,6 +1027,107 @@ $("#mnCards").addEventListener("click",e=>{
   }
 });
 refreshMn(true);
+
+
+/* Heart structure and blood flow, with submit-to-check practice. */
+const HEART_FLOW=[
+  {name:"Body tissues",kind:"organ",oxygen:"low",explain:"Body tissues use oxygen. Blood returning from the tissues is relatively oxygen-poor. From here it enters systemic veins."},
+  {name:"Superior + inferior vena cava",kind:"vessel",oxygen:"low",explain:"The superior vena cava returns blood from the upper body; the inferior vena cava returns blood from the lower body. Both empty into the right atrium."},
+  {name:"Right atrium",kind:"chamber",oxygen:"low",explain:"The right atrium receives systemic venous blood. ATRIA = ARRIVE; this is the receiving chamber on the body's right side."},
+  {name:"Tricuspid valve",kind:"valve",oxygen:"low",explain:"The tricuspid (right atrioventricular) valve lets blood pass into the right ventricle and prevents backward flow. TRI = RIGHT."},
+  {name:"Right ventricle",kind:"chamber",oxygen:"low",explain:"The right ventricle contracts to send oxygen-poor blood toward the lungs. RIGHT → LUNGS."},
+  {name:"Pulmonary valve",kind:"valve",oxygen:"low",explain:"The pulmonary semilunar valve lies between the right ventricle and the pulmonary trunk."},
+  {name:"Pulmonary trunk",kind:"vessel",oxygen:"low",explain:"This large vessel leaves the right ventricle and branches into the right and left pulmonary arteries."},
+  {name:"Right + left pulmonary arteries",kind:"vessel",oxygen:"low",explain:"These arteries carry oxygen-poor blood AWAY from the heart to the lungs. This is the important artery/oxygen exception."},
+  {name:"Lung capillaries",kind:"organ",oxygen:"transition",explain:"Gas exchange happens here: blood releases carbon dioxide and picks up oxygen. This is the transition from oxygen-poor to oxygen-rich blood."},
+  {name:"Pulmonary veins",kind:"vessel",oxygen:"high",explain:"Pulmonary veins carry oxygen-rich blood BACK to the heart, entering the left atrium. This is the important vein/oxygen exception."},
+  {name:"Left atrium",kind:"chamber",oxygen:"high",explain:"The left atrium RECEIVES oxygen-rich blood returning from the lungs."},
+  {name:"Mitral (bicuspid) valve",kind:"valve",oxygen:"high",explain:"The mitral valve (also called bicuspid or left AV valve) leads into the left ventricle. BI = LEFT."},
+  {name:"Left ventricle",kind:"chamber",oxygen:"high",explain:"Its thick muscular wall pumps oxygen-rich blood at high pressure to the entire body. LEFT → BODY."},
+  {name:"Aortic valve",kind:"valve",oxygen:"high",explain:"The aortic semilunar valve controls outflow from the left ventricle into the aorta and prevents backflow."},
+  {name:"Aorta",kind:"vessel",oxygen:"high",explain:"The aorta distributes oxygen-rich blood through the systemic arteries to body tissues. The route then repeats."}
+];
+let heartCurrent=0,heartHidden=false;
+function renderHeartRoute(){
+  const stage=(s,i)=>
+    '<button type="button" class="heart-stage" data-heart-stage="'+i+'" aria-pressed="'+(heartCurrent===i)+'">'+esc(s.name)+'</button>';
+  const lane=(list,start)=>list.map((s,j)=>(j?'<span class="heart-arrow" aria-hidden="true">→</span>':"")+stage(s,j+start)).join("");
+  $("#heartLowSteps").innerHTML=lane(HEART_FLOW.slice(0,9),0);
+  $("#heartHighSteps").innerHTML=lane(HEART_FLOW.slice(9),9)+'<span class="heart-arrow" aria-hidden="true">→ Body ↻</span>';
+  const current=HEART_FLOW[heartCurrent];
+  $("#heartStageInfo").innerHTML='<small>Stop '+(heartCurrent+1)+' of '+HEART_FLOW.length+' · '+(current.oxygen==="low"?"Oxygen-poor":current.oxygen==="high"?"Oxygen-rich":"Gas exchange")+'</small><b>'+esc(current.name)+'</b><p>'+esc(current.explain)+'</p>';
+  $("#heartRoute").hidden=heartHidden;
+  $("#heartHideRoute").textContent=heartHidden?"Show blood-flow route":"Hide route for practice";
+  $("#heartHideRoute").setAttribute("aria-pressed",String(heartHidden));
+}
+$("#heartRoute").addEventListener("click",e=>{
+  const stage=e.target.closest("[data-heart-stage]");
+  if(stage){heartCurrent=Number(stage.dataset.heartStage);renderHeartRoute()}
+});
+$("#heartHideRoute").addEventListener("click",()=>{heartHidden=!heartHidden;renderHeartRoute()});
+let heartQuizOrder=[],heartQuizIndex=0,heartQuizSelected=null,heartQuizChecked=false,heartQuizCorrect=0,heartQuizChoices=[];
+function heartCreateChoices(currentIndex){
+  const answer=(currentIndex+1)%HEART_FLOW.length;
+  const candidate=shuffle(HEART_FLOW.map((s,i)=>({i,kind:s.kind})).filter(x=>x.i!==answer&&x.kind===HEART_FLOW[answer].kind)).map(x=>x.i);
+  const rest=shuffle(HEART_FLOW.map((s,i)=>i).filter(i=>i!==answer&&!candidate.includes(i)));
+  return shuffle([answer,...candidate,...rest].slice(0,4));
+}
+function renderHeartQuiz(){
+  const finished=heartQuizIndex>=heartQuizOrder.length;
+  $("#heartQuizProgress").textContent=finished?"Practice complete":"Question "+(heartQuizIndex+1)+" of "+heartQuizOrder.length;
+  $("#heartQuizScore").textContent=heartQuizCorrect+" correct out of "+(finished?heartQuizOrder.length:heartQuizIndex+(heartQuizChecked?1:0))+" checked";
+  $("#heartQuizCheck").hidden=finished||heartQuizChecked;
+  $("#heartQuizCheck").disabled=heartQuizSelected===null;
+  $("#heartQuizNext").hidden=finished||!heartQuizChecked;
+  $("#heartQuizNext").textContent=heartQuizIndex===heartQuizOrder.length-1?"See results":"Next question →";
+  if(finished){
+    $("#heartQuizQuestion").textContent="You got "+heartQuizCorrect+" of "+heartQuizOrder.length+" correct.";
+    $("#heartQuizOptions").innerHTML="";
+    $("#heartQuizFeedback").textContent="Restart to practice the entire route again.";
+    $("#heartQuizFeedback").className="heart-feedback "+(heartQuizCorrect===heartQuizOrder.length?"ok":"");
+    return;
+  }
+  const current=heartQuizOrder[heartQuizIndex],answer=(current+1)%HEART_FLOW.length;
+  $("#heartQuizQuestion").textContent="Blood has just passed through "+HEART_FLOW[current].name+". What structure comes next?";
+  $("#heartQuizOptions").innerHTML=heartQuizChoices.map(i=>{
+    let cls="heart-option";
+    if(heartQuizChecked)cls+=i===answer?" heart-correct":i===heartQuizSelected?" heart-incorrect":"";
+    return '<button type="button" class="'+cls+'" data-heart-answer="'+i+'" aria-pressed="'+(i===heartQuizSelected)+'" '+(heartQuizChecked?"disabled":"")+'>'+esc(HEART_FLOW[i].name)+'</button>';
+  }).join("");
+}
+function startHeartQuiz(){
+  heartQuizOrder=shuffle(HEART_FLOW.map((_,i)=>i));
+  heartQuizIndex=0;heartQuizCorrect=0;
+  loadHeartQuestion();
+}
+function loadHeartQuestion(){
+  heartQuizSelected=null;heartQuizChecked=false;
+  if(heartQuizIndex<heartQuizOrder.length)heartQuizChoices=heartCreateChoices(heartQuizOrder[heartQuizIndex]);
+  $("#heartQuizFeedback").textContent="";$("#heartQuizFeedback").className="heart-feedback";
+  renderHeartQuiz();
+}
+$("#heartQuizOptions").addEventListener("click",e=>{
+  const option=e.target.closest("[data-heart-answer]");
+  if(!option||heartQuizChecked)return;
+  heartQuizSelected=Number(option.dataset.heartAnswer);renderHeartQuiz();
+});
+$("#heartQuizCheck").addEventListener("click",()=>{
+  if(heartQuizChecked||heartQuizSelected===null||heartQuizIndex>=heartQuizOrder.length)return;
+  const current=heartQuizOrder[heartQuizIndex],answer=(current+1)%HEART_FLOW.length;
+  const correct=heartQuizSelected===answer;
+  if(correct)heartQuizCorrect++;
+  heartQuizChecked=true;
+  $("#heartQuizFeedback").textContent=correct?"Correct. "+HEART_FLOW[answer].explain:"Not quite. Next is "+HEART_FLOW[answer].name+". "+HEART_FLOW[answer].explain;
+  $("#heartQuizFeedback").className="heart-feedback "+(correct?"ok":"no");
+  renderHeartQuiz();
+});
+$("#heartQuizNext").addEventListener("click",()=>{
+  if(!heartQuizChecked)return;
+  heartQuizIndex++;loadHeartQuestion();
+});
+$("#heartQuizRestart").addEventListener("click",startHeartQuiz);
+renderHeartRoute();
+startHeartQuiz();
 
 /* flashcards */
 $("#cardF").innerHTML=`<option value="all">All terms (${T.length})</option>`+ACTS.map(a=>`<option value="${esc(a)}">${esc(ACTNAME[a])} (${T.filter(t=>t[2]===a).length})</option>`).join("");
