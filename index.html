@@ -126,6 +126,35 @@ ul.pts li[data-fid],p[data-fid]{padding:4px 8px;margin-left:-8px}
 .wo-item small{color:var(--muted);font-size:12px}
 .wo-item .ctl button{padding:4px 10px;font-size:13px}
 .hint{font-size:13px;color:var(--muted);border:1px dashed var(--line);border-radius:8px;padding:8px 12px;margin-bottom:16px}
+
+/* Matching activity */
+.match-board{position:relative;display:flex;gap:54px;align-items:flex-start;margin:16px 0}
+.match-col{flex:1 1 0;min-width:0;position:relative;z-index:1}
+.match-col h3{font-size:13px;color:var(--muted);font-weight:600;margin:0 0 10px}
+.match-stack{display:grid;gap:10px}
+.match-choice{display:block;position:relative;width:100%;min-width:0;min-height:54px;padding:11px 13px;text-align:left;line-height:1.4;font-size:14px;overflow-wrap:anywhere;background:var(--panel);border:1px solid var(--line);border-radius:9px}
+.match-choice::after{content:"";position:absolute;width:9px;height:9px;border:2px solid var(--accent);border-radius:50%;background:var(--panel);top:calc(50% - 5px)}
+.match-left .match-choice::after{right:-6px}
+.match-right .match-choice::after{left:-6px}
+.match-choice.linked{border-color:var(--accent);background:var(--flag-bg)}
+.match-choice.selected{outline:2px solid var(--accent);outline-offset:1px}
+.match-choice.right{border-color:var(--good);background:var(--good-bg)}
+.match-choice.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.match-choice.right::after{border-color:var(--good)}
+.match-choice.wrong::after{border-color:var(--bad)}
+.match-choice small{display:block;color:var(--bad);font-size:12px;font-weight:600;margin-top:6px}
+.match-lines{position:absolute;inset:0;pointer-events:none;z-index:2;overflow:visible}
+.match-wire{stroke:var(--accent);stroke-width:2.5;fill:none;stroke-linecap:round;opacity:.88}
+.match-wire.right{stroke:var(--good)}
+.match-wire.wrong{stroke:var(--bad)}
+.match-feedback{min-height:28px;font-size:14px;margin:4px 0 0}
+.match-feedback.ok{color:var(--good)}
+.match-feedback.no{color:var(--bad)}
+.match-instructions{color:var(--muted);font-size:14px;margin-bottom:8px}
+.match-actions{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.match-actions .buttons{display:flex;flex-wrap:wrap;gap:8px}
+.match-progress{color:var(--muted);font-size:13px}
+@media(max-width:520px){.match-board{gap:28px}.match-choice{font-size:12.5px;padding:9px;min-height:52px}.match-stack{gap:9px}}
 </style>
 
 <header class="wrap top">
@@ -141,6 +170,7 @@ ul.pts li[data-fid],p[data-fid]{padding:4px 8px;margin-left:-8px}
   <a href="#case" data-v="case">Anna's case</a>
   <a href="#terms" data-v="terms">Vocabulary</a>
   <a href="#cards" data-v="cards">Flashcards</a>
+  <a href="#match" data-v="match">Matching</a>
   <a href="#quiz" data-v="quiz">Practice quiz</a>
   <a href="#workon" data-v="workon">Work on<span class="badge" id="woBadge" hidden>0</span></a>
 </div></nav>
@@ -378,6 +408,37 @@ ul.pts li[data-fid],p[data-fid]{padding:4px 8px;margin-left:-8px}
   </div>
 </div>
 
+
+<!-- MATCH -->
+<div id="v-match" data-view hidden>
+  <h2>Match terms &amp; definitions</h2>
+  <p class="lede">Connect each definition to its term. Answers are checked only when you submit.</p>
+  <div class="tools">
+    <select id="mF" aria-label="Matching topic"></select>
+    <select id="mN" aria-label="Pairs per set">
+      <option value="6">6 pairs</option>
+      <option value="8" selected>8 pairs</option>
+      <option value="10">10 pairs</option>
+    </select>
+    <button id="mNew">New set</button>
+  </div>
+  <p class="match-instructions">Tap a definition, then its term (or vice versa) to draw a line. Tap a different partner to change a connection.</p>
+  <div class="match-actions">
+    <span class="match-progress" id="mProgress" aria-live="polite"></span>
+    <div class="buttons">
+      <button id="mClear">Clear lines</button>
+      <button class="primary" id="mCheck" disabled>Check matches</button>
+      <button class="primary" id="mRetry" hidden>Retry missed pairs</button>
+    </div>
+  </div>
+  <div id="mFeedback" class="match-feedback" role="status" aria-live="polite"></div>
+  <div class="match-board" id="mBoard">
+    <svg class="match-lines" id="mLines" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div class="match-col match-left"><h3>Definitions</h3><div class="match-stack" id="mLeft"></div></div>
+    <div class="match-col match-right"><h3>Terms</h3><div class="match-stack" id="mRight"></div></div>
+  </div>
+</div>
+
 <!-- QUIZ -->
 <div id="v-quiz" data-view hidden>
   <h2>Practice quiz</h2>
@@ -596,11 +657,12 @@ const ACTNAME={"1.2.1":"1.2.1 Autopsy","Body systems":"Body systems","1.2.2":"1.
 $("#sysTable").innerHTML="<tr><th>System</th><th>Function</th><th>Key structures</th></tr>"+SYS.map(s=>`<tr><td class="k">${esc(s[0])}</td><td>${esc(s[1])}</td><td>${esc(s[2])}</td></tr>`).join("");
 
 /* router */
-const VIEWS=["notes","case","terms","cards","quiz","workon"];
+const VIEWS=["notes","case","terms","cards","match","quiz","workon"];
 function route(){
   const h=(location.hash||"").slice(1); const v=VIEWS.includes(h)?h:"notes";
   document.querySelectorAll("[data-view]").forEach(el=>el.hidden=el.id!=="v-"+v);
   document.querySelectorAll("nav.tabs a").forEach(a=>{if(a.dataset.v===v)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
+  if(v==="match")requestAnimationFrame(drawMatchLines);
 }
 addEventListener("hashchange",()=>{route();scrollTo(0,0)});route();
 
@@ -652,6 +714,123 @@ $("#cardF").onchange=buildDeck;$("#cardSide").onchange=()=>{flipped=false;showCa
 addEventListener("keydown",e=>{if(location.hash!=="#cards"||e.target.matches("input,select,textarea"))return;
   if(e.key==="ArrowRight")move(1);else if(e.key==="ArrowLeft")move(-1);else if(e.key===" "&&e.target!==$("#card")){e.preventDefault();flip()}});
 buildDeck();
+
+
+/* Term-definition line matching */
+$("#mF").innerHTML='<option value="all">All vocabulary</option>'+ACTS.map(a=>'<option value="'+esc(a)+'">'+esc(ACTNAME[a])+'</option>').join("");
+let matchPool=[],matchCursor=0,matchSet=[],matchLeftOrder=[],matchRightOrder=[];
+let matchLinks=new Map(),matchSolved=new Set(),matchSelected=null,matchChecked=false,matchLastCorrect=0;
+function matchingPool(){
+  const filter=$("#mF").value,seen=new Set();
+  return T.map((t,i)=>({id:i,term:t[0],definition:t[1],topic:t[2]})).filter(t=>{
+    const key=t.term.toLowerCase();
+    if((filter!=="all"&&t.topic!==filter)||seen.has(key))return false;
+    seen.add(key);return true;
+  });
+}
+function nextMatchSet(resetPool){
+  if(resetPool||!matchPool.length){matchPool=shuffle(matchingPool());matchCursor=0}
+  const count=Math.min(Number($("#mN").value),matchPool.length),chosen=[];
+  while(chosen.length<count){
+    if(matchCursor>=matchPool.length){matchPool=shuffle(matchingPool());matchCursor=0}
+    const item=matchPool[matchCursor++];
+    if(!chosen.some(t=>t.id===item.id))chosen.push(item);
+  }
+  matchSet=chosen;matchSolved=new Set();startMatchingRound();
+}
+function startMatchingRound(){
+  const remaining=matchSet.filter(t=>!matchSolved.has(t.id));
+  matchLeftOrder=shuffle(remaining);matchRightOrder=shuffle(remaining);
+  matchLinks=new Map();matchSelected=null;matchChecked=false;matchLastCorrect=0;
+  $("#mFeedback").textContent="";$("#mFeedback").className="match-feedback";
+  renderMatching();
+}
+function matchChoice(t,side){
+  const left=side==="left";
+  const partner=left?matchLinks.get(t.id):[...matchLinks].find(pair=>pair[1]===t.id)?.[0];
+  const linked=partner!==undefined,correct=linked&&partner===t.id;
+  const selected=matchSelected&&matchSelected.side===side&&matchSelected.id===t.id;
+  const cls="match-choice"+(linked?" linked":"")+(selected?" selected":"")+(matchChecked&&linked?(correct?" right":" wrong"):"");
+  const correction=matchChecked&&left&&!correct?'<small>Correct: '+esc(t.term)+'</small>':"";
+  return '<button type="button" class="'+cls+'" data-match-side="'+side+'" data-match-id="'+t.id+'" aria-pressed="'+Boolean(selected)+'">'+esc(left?t.definition:t.term)+correction+'</button>';
+}
+function renderMatching(){
+  const old=document.activeElement;
+  const fs=old&&old.dataset?old.dataset.matchSide:null,fi=old&&old.dataset?old.dataset.matchId:null;
+  $("#mLeft").innerHTML=matchLeftOrder.map(t=>matchChoice(t,"left")).join("");
+  $("#mRight").innerHTML=matchRightOrder.map(t=>matchChoice(t,"right")).join("");
+  if(fs&&fi){
+    const target=$("#mBoard").querySelector('[data-match-side="'+fs+'"][data-match-id="'+fi+'"]');
+    if(target)target.focus({preventScroll:true});
+  }
+  const remaining=matchSet.length-matchSolved.size;
+  const done=matchSolved.size+(matchChecked?matchLastCorrect:0);
+  $("#mProgress").textContent=matchChecked?done+" of "+matchSet.length+" correct":matchLinks.size+" of "+remaining+" connected"+(matchSolved.size?" · "+matchSolved.size+" already correct":"");
+  $("#mCheck").disabled=matchChecked||!remaining||matchLinks.size!==remaining;
+  $("#mClear").disabled=matchChecked||!matchLinks.size;
+  $("#mRetry").hidden=!matchChecked||done===matchSet.length;
+  requestAnimationFrame(drawMatchLines);
+}
+function chooseMatch(side,id){
+  if(matchChecked)return;
+  if(matchSelected&&matchSelected.side!==side){
+    const from=side==="left"?id:matchSelected.id,to=side==="right"?id:matchSelected.id;
+    for(const [a,b] of matchLinks)if(a===from||b===to)matchLinks.delete(a);
+    matchLinks.set(from,to);matchSelected=null;
+  }else{
+    matchSelected=matchSelected&&matchSelected.side===side&&matchSelected.id===id?null:{side,id};
+  }
+  renderMatching();
+}
+$("#mBoard").addEventListener("click",e=>{
+  const button=e.target.closest("[data-match-side]");
+  if(button)chooseMatch(button.dataset.matchSide,Number(button.dataset.matchId));
+});
+$("#mCheck").addEventListener("click",()=>{
+  const remaining=matchSet.length-matchSolved.size;
+  if(matchChecked||matchLinks.size!==remaining)return;
+  matchChecked=true;matchSelected=null;
+  matchLastCorrect=[...matchLinks].filter(([a,b])=>a===b).length;
+  const total=matchSolved.size+matchLastCorrect,complete=total===matchSet.length;
+  $("#mFeedback").textContent=complete?"All "+matchSet.length+" pairs correct. Choose New set to continue.":total+" of "+matchSet.length+" correct. Review the red connections, then retry the missed pairs. Correct pairs will be removed.";
+  $("#mFeedback").className="match-feedback "+(complete?"ok":"no");
+  renderMatching();
+});
+$("#mRetry").addEventListener("click",()=>{
+  if(!matchChecked)return;
+  for(const [a,b] of matchLinks)if(a===b)matchSolved.add(a);
+  startMatchingRound();
+});
+$("#mClear").addEventListener("click",()=>{
+  if(matchChecked)return;
+  matchLinks.clear();matchSelected=null;renderMatching();
+});
+$("#mNew").addEventListener("click",()=>nextMatchSet(false));
+$("#mF").addEventListener("change",()=>nextMatchSet(true));
+$("#mN").addEventListener("change",()=>nextMatchSet(true));
+function drawMatchLines(){
+  const board=$("#mBoard"),svg=$("#mLines");
+  if($("#v-match").hidden)return;
+  const rect=board.getBoundingClientRect();
+  if(!rect.width||!rect.height)return;
+  svg.setAttribute("viewBox","0 0 "+rect.width+" "+rect.height);
+  svg.setAttribute("width",rect.width);svg.setAttribute("height",rect.height);
+  const num=n=>Number(n).toFixed(1);let wires="";
+  for(const [a,b] of matchLinks){
+    const left=board.querySelector('[data-match-side="left"][data-match-id="'+a+'"]');
+    const right=board.querySelector('[data-match-side="right"][data-match-id="'+b+'"]');
+    if(!left||!right)continue;
+    const l=left.getBoundingClientRect(),r=right.getBoundingClientRect();
+    const x1=l.right-rect.left,y1=l.top-rect.top+l.height/2;
+    const x2=r.left-rect.left,y2=r.top-rect.top+r.height/2,bend=(x2-x1)*.4;
+    const path="M "+num(x1)+" "+num(y1)+" C "+num(x1+bend)+" "+num(y1)+", "+num(x2-bend)+" "+num(y2)+", "+num(x2)+" "+num(y2);
+    wires+='<path class="match-wire'+(matchChecked?(a===b?" right":" wrong"):"")+'" d="'+path+'"></path>';
+  }
+  svg.innerHTML=wires;
+}
+if(typeof ResizeObserver!=="undefined")new ResizeObserver(drawMatchLines).observe($("#mBoard"));
+addEventListener("resize",drawMatchLines);
+nextMatchSet(true);
 
 /* quiz */
 const qTopics=["all",...ACTS,"Anna's case"];
